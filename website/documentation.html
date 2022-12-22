@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <!-- <link rel="stylesheet" href="sswg.css"> -->
+    <link rel="stylesheet" href="taptapir.css">
+</head>
+<body>
+<left>
+<title>Taptapir Documentation</title>
+
+<a href="index.html" style="text-decoration:none">
+    <div id="header">
+        Taptapir
+    </div>
+</a>
+
+<div class="project_title">Documentation</div>
+<br><br><br><br>
+
+<div class="project_container" id="Taptapir" style="width:650px;">
+    <div class="project_title">sunsnake</div>
+    <div class="project_description">
+<div class="code_block"><blue>print</blue>()
+</div>
+if-statements
+<div class="code_block"><purple>if</purple> a and b or <purple>not</purple> c:
+    <blue>print</blue>(<green>'success'</green>)
+</div>
+Functions
+<div class="code_block"><purple>def</purple> my_function():
+    <blue>print</blue>(<green>'hi'</green>)
+</div>
+Arrays
+<div class="code_block">my_list = [<yellow>6</yellow>,<yellow>2</yellow>,<yellow>9</yellow>,<yellow>0</yellow>,<yellow>3</yellow>]
+</div>
+Iterate array
+<div class="code_block"><purple>for</purple> e in my_list:
+    <blue>print</blue>(e)
+</div>
+Iterate with index
+<div class="code_block"><purple>for</purple> i, e in enumerate(my_list):
+    <blue>print</blue>(i, e)
+</div>
+2D Array
+<div class="code_block">Array_2d(width, height)
+</div>
+    </div>
+</div>
+
+<div class="project_container" id="Taptapir" style="width:650px;">
+    <div class="project_title">taptapir</div>
+    <div class="project_description">
+
+Global functions
+<div class="code_block">set_orientation(<green>'vertical'</green> / <green>'horizontal'</green>)
+set_window_color()
+set_background_color()
+set_scale()   <gray># scale game view</gray>
+set_fullscreen(False / True)
+</div>
+Global variables
+<div class="code_block">ASSETS_FOLDER = <green>''</green>
+entities = []
+scene       <gray># default parent for entities.</gray>
+camera
+camera.ui   <gray># default parent for ui elements. Not relevant if you never move the camera or change camera.fov.</gray>
+aspect_ratio
+
+top_left =      [-.<yellow>5</yellow>, .<yellow>5</yellow>*aspect_ratio]
+top_right =     [.<yellow>5</yellow>, .<yellow>5</yellow>*aspect_ratio]
+bottom_left =   [-.<yellow>5</yellow>, -.<yellow>5</yellow>*aspect_ratio]
+bottom_right =  [.<yellow>5</yellow>, -.<yellow>5</yellow>*aspect_ratio]
+top =           [<yellow>0</yellow>, .<yellow>5</yellow>*aspect_ratio]
+bottom =        [<yellow>0</yellow>, -.<yellow>5</yellow>*aspect_ratio]
+left =          [-.<yellow>5</yellow>, <yellow>0</yellow>]
+right =         [.<yellow>5</yellow>, <yellow>0</yellow>]
+</div>
+Entity
+<div class="code_block"><olive>Entity</olive>
+.parent
+.children
+.enabled
+.visible_self
+.name
+
+.position / .xy
+.x / .y
+.z   <gray># sorting</gray>
+
+.scale = [<yellow>1</yellow>,<yellow>1</yellow>]
+.scale_x / .scale_y
+.origin
+.look_at()
+
+.color
+.alpha
+.texture = <green>'some_image.png'</green>
+.roundness   <gray># 0</gray>
+.padding
+.shadow      <gray># False / True</gray>
+
+.text = <green>''</green>
+.text_color
+.text_size
+.text_origin
+.fit_to_text()
+
+.on_click
+.on_enable
+.on_disable
+
+.ignore_collision
+.draggable    <gray># False / True</gray>
+.dragging     <gray># to check if it's being currently dragged.</gray>
+.lock_x / .lock_y
+.min_x / .max_x / .min_y /.max_y
+.snap_x / .snap_y
+
+.tileset_size
+.tile_coordinate
+
+</div>
+Classes
+<div class="code_block">Button
+Text
+Scene
+goto_scene(<green>'name'</green>)
+HealthBar
+</div>
+
+Math
+<div class="code_block">lerp()
+clamp()
+random_int()
+random_choice()
+lists_are_equal()
+</div>
+
+</div>
+</body>
+</html>

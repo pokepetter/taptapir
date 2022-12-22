@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <link rel="stylesheet" href="sswg.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<left>
+<title>index</title>
+<br>
+
+<div style="font-family: arial;max-width: 650px; margin: auto;font-size: 160.0px;font-weight: bold;">
+Taptapir<br>
+<div style="font-size: 30.0px;font-weight: normal;">
+<br>
+frame work for mobile and web games<br>
+<br>
+<br>
+<img src="taptapir_portfolio_banner.webp" alt="taptapir_apps" width="862" height="240">
+<a href=" download.html" class="button">Download</a>&nbsp;&nbsp; <a href=" documentation.html" class="button">Documentation</a>&nbsp;&nbsp; <a href=" link.html" class="button">GitHub</a><br>
+<br>
+<br>
+<br>
+<div style="font-size: 40.0px;font-weight: bold;">
+<div id="Made with sunsnake"/><br>
+Made with sunsnake<br>
+<div style="font-size: 20.0px;font-weight: normal;">
+<br>
+Dustred<br>
+Gem Hunter<br>
+Dreamland Sketcher<br>
+Color Matcher<br>
+Digging Game?<br>
+<br>
+
+</body>
+</html>

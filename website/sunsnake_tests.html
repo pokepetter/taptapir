@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>sunsnake tests</title></head>
+<script type='text/sunsnake'>
+
+print('range:')
+for i in range(8):
+    print(i)
+
+for i in range(1, 8):
+    print(i)
+
+for i in range(1, 8, 2):
+    print(i)
+
+
+# for i in 8:
+#     print(i)
+
+print('enumerate:')
+my_list = ['sun', 'snake', 'script']
+for i, e in enumerate(my_list):
+    print(i, e)
+
+print('list comprehension:')
+my_list = [1, 0, 9, 4, 8]
+my_list = [e for e in my_list if e < 5]
+for e in my_list:
+    print(e)
+# >>> [1, 0, 4]
+
+</script><script src="../taptapir/sunsnake_compiler.js"></script></html>

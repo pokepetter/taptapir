@@ -1,0 +1,134 @@
+# arial, width 650, left, size 8, bold
+<a href="sunsnake.html" style="white-space: normal; text-decoration: none; color: inherit"> sunsnake script</a>
+### Documentation
+
+```
+print()
+```
+
+if-statements
+```
+if a and b or not c:
+    print('success')
+```
+
+functions
+```
+def my_function():
+    print('hi')
+```
+
+array
+```
+my_list = [6,2,9,0,3]
+```
+
+iterate array
+```
+for e in my_list:
+    print(e)
+```
+
+iterate with index
+```
+for i, e in enumerate(my_list):
+    print(i, e)
+```
+
+```
+Array_2d(width, height)
+```
+
+
+### taptapir
+
+global functions
+```
+set_orientation('vertical' / 'horizontal')
+set_window_color()
+set_background_color()
+set_scale()   # scale game view
+set_fullscreen(False / True)
+```
+
+global variables
+```
+ASSETS_FOLDER = ''
+entities = []
+scene       # default parent for entities.
+camera
+camera.ui   # default parent for ui elements. Not relevan if you never move the camera or change camera.fov.
+aspect_ratio
+
+top_left =      [-.5, .5*aspect_ratio]
+top_right =     [.5, .5*aspect_ratio]
+bottom_left =   [-.5, -.5*aspect_ratio]
+bottom_right =  [.5, -.5*aspect_ratio]
+top =           [0, .5*aspect_ratio]
+bottom =        [0, -.5*aspect_ratio]
+left =          [-.5, 0]
+right =         [.5, 0]
+```
+
+```
+Entity
+.parent
+.children
+.enabled
+.visible_self
+.name
+
+.position / .xy
+.x / .y
+.z   # sorting
+
+.scale = [1,1]
+.scale_x / .scale_y
+.origin
+.look_at()
+
+.color
+.alpha
+.texture = 'some_image.png'
+.roundness   # 0
+.padding
+.shadow      # False / True
+
+.text = ''
+.text_color
+.text_size
+.text_origin
+.fit_to_text()
+
+.on_click
+.on_enable
+.on_disable
+
+.ignore_collision
+.draggable    # False / True
+.dragging     # to check if it's being currently dragged.
+.lock_x / .lock_y
+.min_x / .max_x / .min_y /.max_y
+.snap_x / .snap_y
+
+.tileset_size
+.tile_coordinate
+
+```
+
+```
+Button
+Text
+Scene
+goto_scene('name')
+HealthBar
+```
+
+math
+```
+lerp()
+clamp()
+random_int()
+random_choice()
+lists_are_equal()
+```

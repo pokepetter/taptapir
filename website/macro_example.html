@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>platformer</title><link rel="stylesheet" href="../taptapir.css"></head><body></body><script src="../taptapir/taptapir.js"></script>
+<script type='text/sunsnake'>
+
+# replace the first argument with the second argument
+sunsnake.define(*style, scale=.2, color=hsv(300,1,1), roundness=.25, text_origin=[0,0])
+
+brush_size = [1,1]
+
+# use the defined macro to prevent code duplication
+plus_button = Entity(*style, x=-.1, text='+')
+plus_button.on_click = def():
+    brush_size = [e*1.5 for e in brush_size]
+
+minus_button = Entity(*style, x=.1, text='-')
+minus_button.on_click = def():
+    brush_size = [e*1/1.5 for e in brush_size]
+
+</script><script src="../taptapir/sunsnake_compiler.js"></script></html>

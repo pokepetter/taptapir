@@ -1,0 +1,132 @@
+a.button {
+    padding: 13px 25px;
+    background-color: #555;
+    border-radius: 2em;
+    border-width: 4px;
+    text-decoration: none;
+    color: #1859bb;
+    font-size: 28px;
+    line-height: 2.5em;
+    border-color: #1859bb;
+    border-style: solid;
+    background-color: transparent;
+    letter-spacing: 2px;
+    margin: 8px;
+}
+a.button:hover {color: #d909ae; border-color: #d909ae; background-color: transparent;}
+body{background-color:#d1d3eb; color:#333;}
+.code_block {
+    background-color: #312832;
+    color:#cfcfcf;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 0;
+    font-family:
+    monospace;
+    font-size: 20;
+    font-weight: normal;
+    white-space: pre;
+    overflow: auto;
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.code_block::-webkit-scrollbar {
+  //display: none;
+}
+gray {color: gray;}
+olive  {color: #dec533;}
+blue   {color: hsl(210deg 73% 61%);}
+purple {color: hsl(289deg 76% 62%);}
+green  {color: #37b764;}
+yellow {color: #d69e13;}
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+scrollbar-width: auto;
+scrollbar-color: #3c3c3c #c2beb3;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+background: #d1d3eb;
+}
+
+*::-webkit-scrollbar-thumb {
+background-color: #3c3c3c;
+border-radius: 10px;
+border: 2px solid #c2beb3;
+}
+@media (max-width: 725px) {
+    .button {display: block;}
+}
+
+@font-face {
+    font-family: Lato;
+    src: url('Lato-Regular.ttf')  format('truetype');
+}
+
+body {
+  font-family: Lato, Arial, Sans-Serif;
+  max-width: 1024px;
+  margin: auto;
+  font-size: 1.5em;
+}
+tag {
+  /* background-color: #49a2ef; */
+  background-color: #ffcd17;
+  border-thickness: 0;
+  border-style: none;
+  padding: 2px 10px 2px 10px;
+  border-radius: 10px;
+  font-size: .75em;
+  /* color: white; */
+  color: #444444;
+  cursor: default;
+}
+#header {
+    font-size: 250.0px;
+    padding-top: 3%;
+    /* padding-bottom: 1%; */
+    background: linear-gradient(120deg, #0c5fc2, #ad0764);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-decoration: none; !important
+}
+
+.project_container {
+  margin-bottom: 5em;
+}
+.project_title {
+  font-size: 2em;
+  padding-bottom: .1em;
+  color: #3f2a80;
+}
+.project_description {
+  white-space: pre-line;
+}
+img {
+  margin: 5px 10px 5px 0px;
+  border-radius: 10px;
+  height: auto;
+}
+video {
+  margin: 5px 10px 5px 0px;
+  border-radius: 5px;
+}
+iframe {
+  max-width: 100%;
+}
+#social_media_bar {
+  padding-bottom: 14%;
+}
+#info {
+  padding-bottom: 15%;
+  font-size: 1.35em;
+}
+#email {
+  padding-top: 1%;
+}
