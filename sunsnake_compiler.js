@@ -136,7 +136,7 @@ function compile(script) {
 
             filter_code = ''
             if (condition != '') {
-                filter_code = `.filter(${element_name} => {if (${condition}) return ${element_name}})`
+                filter_code = `.myCustomFilter(${element_name} => {if (${condition}) return ${element_name}})`
             }
 
             lines[i] = `${code_before_list_comprehension}${target_list}${map_code}${filter_code}${code_after_list_comprehension}`
@@ -356,6 +356,15 @@ function range(start, stop, step) {
     }
     return result;
 };
+Array.prototype.myCustomFilter = function (fn) {
+    const filtered = []
+    for (let i=0; i<this.length; i++) {
+        if (fn(this[i]) != undefined) {
+            filtered.push(this[i]);
+        }
+    }
+    return filtered;
+}
 
 var scripts = document.getElementsByTagName("script")
 for (var script of scripts) {
