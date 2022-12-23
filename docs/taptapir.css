@@ -87,9 +87,8 @@ tag {
   cursor: default;
 }
 #header {
-    font-size: 250.0px;
+    font-size: min(100vw, 250px);
     padding-top: 3%;
-    /* padding-bottom: 1%; */
     background: linear-gradient(120deg, #0c5fc2, #ad0764);
     -webkit-background-clip: text;
     background-clip: text;
@@ -112,6 +111,7 @@ img {
   margin: 5px 10px 5px 0px;
   border-radius: 10px;
   height: auto;
+  max-width: 100%; 
 }
 video {
   margin: 5px 10px 5px 0px;
