@@ -1,0 +1,77 @@
+<html><title>tic tac toe</title><body>
+<script src="../../taptapir.js"></script>
+<script type='text/sunsnake'>
+
+set_window_color('rgb(50 50 50)')
+set_background_color('rgb(9 9 1)')
+# set_orientation('landscape')
+
+# from ursina import *
+
+
+# app = Ursina()
+
+camera.fov = 3.25
+camera.position = [1, 1]
+# Text.default_resolution *= 2
+
+p1_color = '#1587d1'
+p2_color = '#d14515'
+player = Entity(name='o', color=p1_color, enabled=False)
+# bg = Entity(parent=scene, model='quad', texture='shore', scale=(16,8), z=10, color='light_gray')
+board = Array_2d(3,3)
+turns_taken = 0
+for y in range(3):
+    for x in range(3):
+        let b = Entity(scale=1, position=[x,y], roundness=.1, text_origin=[0,0], text_size=8, text_color='white', clicked=False)
+        board[x][y] = b
+
+        b.on_click = def():
+            if b.clicked:
+                return
+            b.text = player.name
+            b.color = player.color
+            b.clicked = True
+            turns_taken += 1
+            check_for_victory()
+
+            if player.name == 'o':
+                player.name = 'x'
+                player.color = p2_color
+            else:
+                player.name = 'o'
+                player.color = p1_color
+
+
+end_of_game_screen = Button(scale=.5, text_origin=[0,0], background=True, color='black', text_color='white', shadow=True, alpha=.9, z=-1, enabled=False)
+restart_button = Button(parent=end_of_game_screen, text='restart', color=hsv(320,.8,.7), text_color=hsv(0,0,.8), scale=[.5,.3], y=-.45, on_click=reset)
+def check_for_victory():
+    name = player.name
+    won = ((board[0][0].text == name and board[1][0].text == name and board[2][0].text == name)
+    or (board[0][1].text == name and board[1][1].text == name and board[2][1].text == name)
+    or  (board[0][2].text == name and board[1][2].text == name and board[2][2].text == name)
+    or  (board[0][0].text == name and board[0][1].text == name and board[0][2].text == name)
+    or (board[1][0].text == name and board[1][1].text == name and board[1][2].text == name)
+    or (board[2][0].text == name and board[2][1].text == name and board[2][2].text == name)
+    or (board[0][0].text == name and board[1][1].text == name and board[2][2].text == name)
+    or (board[0][2].text == name and board[1][1].text == name and board[2][0].text == name))
+
+    if turns_taken >= 9 and not won:
+        print('draw')
+        end_of_game_screen.text = `Draw!`
+        end_of_game_screen.enabled = True
+
+    if won:
+        print('winner is:', name)
+        end_of_game_screen.text = `player\n${name}\nwon!`
+        end_of_game_screen.enabled = True
+
+def reset():
+    end_of_game_screen.enabled = False
+    [e.color = color.white for e in board.flat()]
+    [e.text = '' for e in board.flat()]
+    [e.clicked = False for e in board.flat()]
+    turns_taken = 0
+
+# app.run()
+</script><script src="../../sunsnake_compiler.js"></script></html>

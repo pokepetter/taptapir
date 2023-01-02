@@ -15,10 +15,6 @@ style.textContent = `
     visibility: 'visible'; display:inherit; image-rendering: pixelated;
     background-repeat:repeat;
     white-space: pre;
-    /* font-size: 5vh; */
-    /* padding: .75em; */
-    /* text-align: center; */
-    /* border-radius: 128px; border-style:solid; border-color: white; */
 }
 .entity:focus {
     outline: 0; -moz-outline-style: none;
@@ -64,7 +60,6 @@ scene = document.createElement('entity')
 scene.className = 'entity'
 scene.id = 'scene'
 game_window.appendChild(scene)
-
 
 // print('browser aspect_ratio:', browser_aspect_ratio)
 var format = null
@@ -132,7 +127,6 @@ function set_orientation(value) {
     }
 }
 set_orientation('vertical')
-print('spect', asp_x, asp_y)
 
 
 function set_window_color(value) {game_window.style.backgroundColor = value}
@@ -153,7 +147,6 @@ function set_fullscreen(value) {
 }
 
 ASSETS_FOLDER = ''
-
 entities = []
 
 class Entity {
@@ -560,11 +553,6 @@ class Camera{
           scene.style.top = `${50+(value*100/this.fov)}%`
       }
   }
-  // get z() {return this._z}
-  // set z(value) {
-  //     scene.style.zIndex = -value
-  //     this._z = value
-  // }
   get xy() {return [this._x, this._y]}
   set xy(value) {
       this.x = value[0]
@@ -624,7 +612,6 @@ function Button(options) {
             options['scale'][1] = options['scale_y']
         }
     }
-    // print(options)
     return new Entity(options)
 }
 
@@ -635,18 +622,6 @@ function Canvas(options) {
 
     return e
 }
-
-
-// function StateHandler(states, fade=true) {
-//     var that = Object.create(StateHandler.prototype)
-//     that.states = states
-//     that.fade = fade
-//
-//     that.overlay = new Entity({name:'overlay', color:'black', alpha:0, z:-1, scale:[1,aspect_ratio]})
-//
-//     that['state'] = Object.keys(states)[0]
-//     return that
-// }
 
 function Scene(name='', options=false) {
     settings = {visible_self:false, on_enter:null}
@@ -698,10 +673,7 @@ class StateHandler {
     }
 }
 
-state_handler = new StateHandler({
-    // main_menu : b,
-    // scene_2 : scene_2
-}, true)
+state_handler = new StateHandler({}, true)
 
 function goto_scene(scene_name, fade=True) {
     if (!fade) {
@@ -709,17 +681,14 @@ function goto_scene(scene_name, fade=True) {
         return
     }
     state_handler.state = scene_name
-
-
-
 }
+
 class HealthBar extends Entity {
     constructor(options=false) {
         let settings = {min:0, max:100, color:'#222', scale:[.8,.05], y:.75, roundness:.25}
         settings['default'] = settings['max']
         for (const [key, value] of Object.entries(options)) {
             if (key == 'bar_color') {continue}
-            // print(key, value)
             settings[key] = value
         }
         super(settings)
@@ -730,7 +699,6 @@ class HealthBar extends Entity {
         }
 
         this.value = this.default
-
     }
 
     get value() {return this._value}
@@ -744,12 +712,11 @@ class HealthBar extends Entity {
 }
 
 mouse = {x:0, y:0, position:[0,0], left:false, middle:false, hovered_entity:null,
-    set texture(name) {
+    set texture(name) {     // TODO: fix this
         document.body.style.cursor = `url('${name}', auto)`
-        print('spegijseofijseofijseiofddddddddddddddddddddddddddddddd', document.body.style)
+        // print('spegijseofijseofijseiofddddddddddddddddddddddddddddddd', document.body.style)
     }
 }
-
 
 function mousedown(event) {
     _input(event)
@@ -784,8 +751,6 @@ function handle_mouse_click(e) {
                 ((((e.clientX - window_position.left) / game_window.clientWidth) - .5) * asp_x) - entity.x,
                 (-(((e.clientY - window_position.top) / game_window.clientHeight ) - .5) / asp_y) - entity.y
                 ]
-            // prinkt(entity.start_offset)
-
             entity.dragging = true
         }
     }
@@ -895,8 +860,6 @@ function hsv(h, s, v) {
         case 4: r = t, g = p, b = v; break;
         case 5: r = v, g = p, b = q; break;
     }
-    // return {r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255)};
-    // print('adwoiadjaoijdawd', [parseInt(r*255), parseInt(g*255), parseInt(b*255)])
     return [parseInt(r*255), parseInt(g*255), parseInt(b*255)];
 }
 

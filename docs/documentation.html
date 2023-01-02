@@ -14,39 +14,11 @@
         Taptapir
     </div>
 </a>
-
+<br><br>
 <div class="project_title">Documentation</div>
 <br><br><br><br>
 
-<div class="project_container" id="Taptapir" style="width:650px;">
-    <div class="project_title">sunsnake</div>
-    <div class="project_description">
-<div class="code_block"><blue>print</blue>()
-</div>
-if-statements
-<div class="code_block"><purple>if</purple> a and b or <purple>not</purple> c:
-    <blue>print</blue>(<green>'success'</green>)
-</div>
-Functions
-<div class="code_block"><purple>def</purple> my_function():
-    <blue>print</blue>(<green>'hi'</green>)
-</div>
-Arrays
-<div class="code_block">my_list = [<yellow>6</yellow>,<yellow>2</yellow>,<yellow>9</yellow>,<yellow>0</yellow>,<yellow>3</yellow>]
-</div>
-Iterate array
-<div class="code_block"><purple>for</purple> e in my_list:
-    <blue>print</blue>(e)
-</div>
-Iterate with index
-<div class="code_block"><purple>for</purple> i, e in enumerate(my_list):
-    <blue>print</blue>(i, e)
-</div>
-2D Array
-<div class="code_block">Array_2d(width, height)
-</div>
-    </div>
-</div>
+
 
 <div class="project_container" id="Taptapir" style="width:650px;">
     <div class="project_title">taptapir</div>
@@ -128,13 +100,90 @@ Scene
 goto_scene(<green>'name'</green>)
 HealthBar
 </div>
-
 Math
 <div class="code_block">lerp()
 clamp()
 random_int()
 random_choice()
+random_color()
 lists_are_equal()
+</div>
+</div>
+<br>
+<div class="project_container" id="Taptapir" style="width:650px;">
+    <div class="project_title">sunsnake</div>
+    <div class="project_description">
+Log
+<div class="code_block"><blue>print</blue>()
+</div>
+if-statements
+<div class="code_block"><purple>if</purple> a and b or <purple>not</purple> c:
+    <blue>print</blue>(<green>'success'</green>)
+</div>
+Functions
+<div class="code_block"><purple>def</purple> my_function():
+    <blue>print</blue>(<green>'hi'</green>)
+</div>
+Arrays
+<div class="code_block">my_list = [<yellow>6</yellow>,<yellow>2</yellow>,<yellow>9</yellow>,<yellow>0</yellow>,<yellow>3</yellow>]
+</div>
+Range
+<div class="code_block"><purple>for</purple> i in <blue>range</blue>(<yellow>8</yellow>):
+    <blue>print</blue>(i)
+</div>
+<div class="code_block"><purple>for</purple> i in <blue>range</blue>(<yellow>1</yellow>, <yellow>8</yellow>): <gray># from 1 to 8</gray>
+    <blue>print</blue>(i)
+</div>
+<div class="code_block"><purple>for</purple> i in <blue>range</blue>(<yellow>1</yellow>, <yellow>8</yellow>, <yellow>2</yellow>): <gray># from 1 to 8, with a step of 2</gray>
+    <blue>print</blue>(i)
+</div>
+Shorthand range:
+<div class="code_block"><purple>for</purple> i in <yellow>8</yellow>:
+    <blue>print</blue>(i)
+</div>
+Enumerate
+<div class="code_block">my_list = [<green>'sun'</green>, <green>'snake'</green>, <green>'script'</green>]
+<purple>for</purple> i, e in enumerate(my_list):
+    <blue>print</blue>(i, e)
+
+&gt;&gt;&gt; <yellow>0</yellow> <green>'sun'</green>
+&gt;&gt;&gt; <yellow>1</yellow> <green>'snake'</green>
+&gt;&gt;&gt; <yellow>2</yellow> <green>'script'</green>
+</div>
+Iterate array
+<div class="code_block"><purple>for</purple> e in my_list:
+    <blue>print</blue>(e)
+</div>
+2D Array
+<div class="code_block">Array_2d(width, height)
+</div>
+Macros
+<div class="code_block"><gray># replace the first argument with the second argument</gray>
+sunsnake.define(*style, <olive>scale</olive>=.<yellow>2</yellow>, <olive>color</olive>=hsv(<yellow>3</yellow><yellow>0</yellow><yellow>0</yellow>,<yellow>1</yellow>,<yellow>1</yellow>), roundness=.<yellow>2</yellow><yellow>5</yellow>, text_<olive>origin</olive>=[<yellow>0</yellow>,<yellow>0</yellow>])
+
+brush_size = [<yellow>1</yellow>,<yellow>1</yellow>]
+
+<gray># use the defined macro to prevent code duplication</gray>
+plus_button = <olive>Entity</olive>(*style, x=-.<yellow>1</yellow>, <olive>text</olive>=<green>'+'</green>)
+plus_button.on_click = def():
+    brush_size = [e*<yellow>1</yellow>.<yellow>5</yellow> <purple>for</purple> e in brush_size]
+
+minus_button = <olive>Entity</olive>(*style, x=.<yellow>1</yellow>, <olive>text</olive>=<green>'-'</green>)
+minus_button.on_click = def():
+    brush_size = [e*<yellow>1</yellow>/<yellow>1</yellow>.<yellow>5</yellow> <purple>for</purple> e in brush_size]
+</div>
+List Comprehension
+<div class="code_block">my_list = [<yellow>1</yellow>, <yellow>0</yellow>, <yellow>9</yellow>, <yellow>4</yellow>, <yellow>8</yellow>]
+my_list = [e <purple>for</purple> e in my_list <purple>if</purple> e &lt; <yellow>5</yellow>]
+<blue>print</blue>(my_list)
+
+&gt;&gt;&gt; [<yellow>1</yellow>, <yellow>0</yellow>, <yellow>4</yellow>]
+</div>
+Coroutines/Delay
+<div class="code_block">e = Button(<olive>scale</olive>=.<yellow>2</yellow>, <olive>text</olive>=<green>'?'</green>)
+e.on_click = <purple>def</purple>():
+    <blue>after</blue> <yellow>0.2</yellow>s:
+        e.text = <green>'!!'</green>
 </div>
 
 </div>
