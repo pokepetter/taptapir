@@ -73,21 +73,11 @@ body {
   max-width: 1024px;
   margin: auto;
   font-size: 1.5em;
+  padding: 8px;
 }
-tag {
-  /* background-color: #49a2ef; */
-  background-color: #ffcd17;
-  border-thickness: 0;
-  border-style: none;
-  padding: 2px 10px 2px 10px;
-  border-radius: 10px;
-  font-size: .75em;
-  /* color: white; */
-  color: #444444;
-  cursor: default;
-}
+
 #header {
-    font-size: 250.0px;
+    font-size: min(250.0px, 25vw);
     padding-top: 3%;
     /* padding-bottom: 1%; */
     background: linear-gradient(120deg, #0c5fc2, #ad0764);
@@ -119,14 +109,4 @@ video {
 }
 iframe {
   max-width: 100%;
-}
-#social_media_bar {
-  padding-bottom: 14%;
-}
-#info {
-  padding-bottom: 15%;
-  font-size: 1.35em;
-}
-#email {
-  padding-top: 1%;
 }
