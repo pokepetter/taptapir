@@ -794,9 +794,9 @@ function onmousemove(event) {
         mouse.point = [(x/rect.width)-.5, .5-(y/rect.height)]
     }
     element_hit = document.elementFromPoint(event.pageX - window.pageXOffset, event.pageY - window.pageYOffset);
-    entity = entities[element_hit.entity_index]
-    if (entity) {
-        mouse.hovered_entity = entity
+    _entity = entities[element_hit.entity_index]
+    if (_entity) {
+        mouse.hovered_entity = _entity
     }
     else {
         mouse.hovered_entity = null
@@ -1041,9 +1041,9 @@ function sample(population, k){
 
     return result;
 }
-function destroy(entity) {
-    entity.el.remove()
-    delete entity
+function destroy(_entity) {
+    _entity.el.remove()
+    delete _entity
 }
 
 function save_system_save(name, value) {localStorage.setItem(name, value)}
