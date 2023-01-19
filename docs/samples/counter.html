@@ -4,19 +4,15 @@
 
 set_background_color('#fff')
 set_window_color('#fff')
-text = Text(text='00', text_origin=[0,0], scale=1, y=.2, text_size=8, value=0)
+score = 0
+text = Text(text='00', text_origin=[0,0], scale=1, y=.2, text_size=8)
 b = Button(text='Click me!', color=hsv(160,1,.6), scale=[.3,.15], text_color=color.white)
 b.on_click = def():
-    text.value += 1
-    text.text = `${text.value}`
+    score += 1
+    text.text = `${score}`
     b.scale = [e*1.25 for e in [.3,.15]]
     b.animate('scale_x', .3, duration=.1)
     b.animate('scale_y', .15, duration=.1)
-
-def input(key):
-    if key == 'r':
-        text.value = 0
-        text.text = `${text.value}`
 
 
 </script><script src="../../sunsnake_compiler.js"></script></html>
