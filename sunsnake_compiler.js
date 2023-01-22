@@ -83,7 +83,7 @@ function compile(script) {
             content = [key, value]
             extra_replacements.push(content)
             lines[i] = ''
-            i += 1
+            continue
         }
         for (e of extra_replacements) {
             lines[i] = lines[i].replaceAll(e[0], e[1])
