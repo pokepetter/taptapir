@@ -56,7 +56,7 @@ if (!game_window) {
     }
     document.body.appendChild(game_window)
 }
-scene = document.createElement('entity')
+const scene = document.createElement('entity')
 scene.className = 'entity'
 scene.id = 'scene'
 game_window.appendChild(scene)
@@ -175,6 +175,7 @@ class Entity {
         this.color = 'white'
         this.x = 0
         this.y = 0
+        this.scale = [1,1]
         this.draggable = false
         this.dragging = false
         this.lock_x = false
@@ -185,7 +186,7 @@ class Entity {
         this.min_y = -.5 / asp_y
         this.max_y = .5 / asp_y
 
-       this.snap_x = 0
+        this.snap_x = 0
         this.snap_y = 0
         this.text_size = 3
 
@@ -748,8 +749,8 @@ function handle_mouse_click(e) {
         if (entity.draggable) {
             window_position = game_window.getBoundingClientRect()
             entity.start_offset = [
-                ((((e.clientX - window_position.left) / game_window.clientWidth) - .5) * asp_x) - entity.x,
-                (-(((e.clientY - window_position.top) / game_window.clientHeight ) - .5) / asp_y) - entity.y
+                ((((e.clientX - window_position.left) / game_window.clientWidth) - .5) * asp_x*camera.fov) - entity.x,
+                (-(((e.clientY - window_position.top) / game_window.clientHeight ) - .5) / asp_y*camera.fov) - entity.y
                 ]
             entity.dragging = true
         }
@@ -805,7 +806,7 @@ function onmousemove(event) {
         if (e.dragging) {
             if (!e.lock_x) {
                 // print(mouse.x, e.start_offset[0])
-                e.x = mouse.x - e.start_offset[0]
+                e.x = mouse.x*camera.fov - e.start_offset[0]
                 e.x = clamp(e.x, e.min_x, e.max_x)
                 if (e.snap_x) {
                     hor_step = 1 / e.snap_x
@@ -813,7 +814,7 @@ function onmousemove(event) {
                 }
             }
             if (!e.lock_y) {
-                e.y = mouse.y - e.start_offset[1]
+                e.y = mouse.y*camera.fov - e.start_offset[1]
                 e.y = clamp(e.y, e.min_y, e.max_y)
                 if (e.snap_y) {
                     hor_step = 1 / e.snap_y
