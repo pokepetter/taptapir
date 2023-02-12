@@ -195,18 +195,17 @@ function compile(script) {
             }
             if (lines[i].startsWith(`${class_name}(`) || lines[i].includes(` ${class_name}(`)) {
                 lines[i] = convert_arguments(lines[i], class_name)
-
-                // if (func) {
-                //     lines[i] = lines[i].replace('INLINE_FUNC_PLACEHOLDER', func)
-                // }
             }
         }
-        if (lines[i].includes('new Entity({')) {
-            continue
-        }
-        if (lines[i].includes('Entity(')) {
-            lines[i] = convert_arguments(lines[i], 'Entity')
-            lines[i] = lines[i].replace('Entity(', 'new Entity(')
+
+        for (var class_name of ['Entity', 'HealthBar']) {
+            if (lines[i].includes(`${class_name}({`)) {
+                continue
+            }
+            if (lines[i].includes(`${class_name}(`)) {
+                lines[i] = convert_arguments(lines[i], class_name)
+                lines[i] = lines[i].replace(`${class_name}(`, `new ${class_name}(`)
+            }
         }
 
         // after keyword for easier invoke()
