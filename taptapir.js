@@ -202,6 +202,12 @@ class Entity {
 
     get parent() {return this._parent}
     set parent(value) {
+        if (value === scene || value === null) {
+            scene.appendChild(this.el)
+            this._parent = null
+            return
+        }
+
         value.el.appendChild(this.el)
         if (this._parent) [
             this._parent.children = this.parent.children.filter(item => item !== this) // remove self from old parent's children list
