@@ -202,18 +202,14 @@ class Entity {
 
     get parent() {return this._parent}
     set parent(value) {
-        if (this._parent) {
-            this._parent.children = this.parent.children.filter(item => item !== this) // remove self from old parent's children list
-        }
-        if (value === scene || value === null) {
-            scene.appendChild(this.el)
-            this._parent = null
-            return
-        }
-
         value.el.appendChild(this.el)
+        if (this._parent) [
+            this._parent.children.remove(self)
+        ]
         this._parent = value
-        value._children.push(this)
+        if (!value.children.includes(this)) {
+            value.children.push(this)
+        }
     }
     get children() {return this._children}
     set children(value) {
@@ -534,7 +530,7 @@ class Camera{
       // this.el.style.height = scene.style.height
       // this.el.style.width = scene.style.width
       this.el.id = 'camera'
-      this._children = []
+      this.children = []
       this._x = 0
       this._y = 0
       this.fov = 1
@@ -699,8 +695,7 @@ class HealthBar extends Entity {
             settings[key] = value
         }
         super(settings)
-        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:'red'})
-        this.text_entity = new Entity({parent:this, text:'hii', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2})
+        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:'lime'})
 
         if (('bar_color' in options)) {
             this.bar_color = settings['bar_color']
@@ -714,10 +709,7 @@ class HealthBar extends Entity {
         value = clamp(value, this.min, this.max)
         // print('set value:', value)
         this._value = value
-        this.bar.scale_x = value / this.max
-        this.text_entity.text = `${value} / ${this.max}`
-    }
-
+        this.bar.scale_x = value / this.max}
     get bar_color() {return this.bar.color}
     set bar_color(value) {this.bar.color = value}
 }
@@ -1052,8 +1044,9 @@ function sample(population, k){
 
     return result;
 }
+
 function destroy(_entity) {
-    _entity.parent = null
+    _entity.parent.children.remove(_entity)
     _entity.el.remove()
     delete _entity
 }
