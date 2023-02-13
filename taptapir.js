@@ -203,9 +203,9 @@ class Entity {
     get parent() {return this._parent}
     set parent(value) {
         value.el.appendChild(this.el)
-        if (this._parent) [
+        if (this._parent) {
             this._parent.children.remove(self)
-        ]
+        }
         this._parent = value
         if (!value.children.includes(this)) {
             value.children.push(this)
@@ -695,7 +695,8 @@ class HealthBar extends Entity {
             settings[key] = value
         }
         super(settings)
-        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:'lime'})
+        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:'red'})
+        this.text_entity = new Entity({parent:this, text:'hii', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2})
 
         if (('bar_color' in options)) {
             this.bar_color = settings['bar_color']
@@ -709,7 +710,9 @@ class HealthBar extends Entity {
         value = clamp(value, this.min, this.max)
         // print('set value:', value)
         this._value = value
-        this.bar.scale_x = value / this.max}
+        this.bar.scale_x = value / this.max
+        this.text_entity.text = `${value} / ${this.max}`
+    }
     get bar_color() {return this.bar.color}
     set bar_color(value) {this.bar.color = value}
 }
