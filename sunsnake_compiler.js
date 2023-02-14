@@ -47,6 +47,24 @@ function compile(script) {
             }
         }
 
+        // after keyword for easier invoke()
+        if (all_lines[i].trimStart().startsWith('after ') && all_lines[i].trimEnd().endsWith(':')) {
+            start_indent = get_indent(all_lines[i])
+            all_lines[i] = all_lines[i].replaceAll('after ', 'after(')
+            all_lines[i] = all_lines[i].slice(0, -1) + ', function()'
+            for (var j=i+1; j<all_lines.length; j++) {
+                if (get_indent(all_lines[j]) <= start_indent) {
+                    // if (lines[j-1].endsWith('}')) {
+                    // all_lines[j] = all_lines[j] + '})'
+                    // }
+                    // else {
+                    // lines[j] = lines[j] + ')'
+                    // }
+                    break
+                }
+            }
+        }
+
         lines.push(all_lines[i])
     }
 
@@ -55,6 +73,7 @@ function compile(script) {
 
     // add brackets based on indentation
     current_indent = 0
+    is_in_after_block = false
 
     for (var i=0; i<lines.length; i++) {
         if (i > 0) {
@@ -67,13 +86,30 @@ function compile(script) {
             }
 
             if (current_line_indent < prev_line_indent) {
-
-                lines[i-1] += '}'.repeat(current_indent - current_line_indent)
+                for (var j of range(current_indent - current_line_indent)) {
+                    lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
+                    if (is_in_after_block) {
+                        lines[i-1] += ')'
+                        is_in_after_block = false
+                    }
+                }
                 current_indent = current_line_indent
+            }
+
+            if (lines[i].trimStart().startsWith('after(')) {
+                is_in_after_block = true;
             }
         }
     }
-    lines.push('}'.repeat(current_indent))
+    new_line = ''
+    for (var j of range(current_indent)) {
+        new_line += '' + '    '.repeat(current_indent-1) + '}'
+        if (is_in_after_block) {
+            new_line += ')'
+            is_in_after_block = false
+        }
+    }
+    lines.push(new_line)
 
     for (var i=0; i<lines.length; i++) {
         if (lines[i].trimStart().startsWith('sunsnake.define(')) {
@@ -208,19 +244,6 @@ function compile(script) {
             }
         }
 
-        // after keyword for easier invoke()
-        if (lines[i].trimStart().startsWith('after ') && lines[i].trimEnd().endsWith('{')) {
-            start_indent = get_indent(lines[i])
-            lines[i] = lines[i].replaceAll('after ', 'after(')
-            lines[i] = lines[i].slice(0, -1) + ', function() {'
-
-            for (var j=i+1; j<lines.length; j++) {
-                if (get_indent(lines[j]) <= start_indent) {
-                    lines[j-1] = lines[j-1] + ')'
-                    break
-                }
-            }
-        }
         for (var n=0; n<10; n++) {
             lines[i] = lines[i].replaceAll(`${n}ms`, `${n}*.001`)
             lines[i] = lines[i].replaceAll(`${n}s`, `${n}`)
@@ -363,6 +386,13 @@ Array.prototype.myCustomFilter = function (fn) {
         }
     }
     return filtered;
+}
+
+Array.prototype.remove = function (element) {
+    var index = this.indexOf(element)
+    if (index >= 0) {
+        this.splice(index, 1)
+    }
 }
 
 var scripts = document.getElementsByTagName("script")
