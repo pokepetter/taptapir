@@ -399,7 +399,12 @@ var scripts = document.getElementsByTagName("script")
 for (var script of scripts) {
     if (script.type == 'text/sunsnake') {
         print('compile:', script)
-        compiled_code = compile(script.textContent)
-        eval(compiled_code)
+        if (script.textContent) {
+            compiled_code = compile(script.textContent)
+            eval(compiled_code)
+        }
+        // else if (script.href) {
+        //     print(script)
+        // }
     }
 }

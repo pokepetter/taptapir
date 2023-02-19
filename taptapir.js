@@ -175,6 +175,7 @@ class Entity {
         this.color = 'white'
         this.x = 0
         this.y = 0
+        this.z = 0
         this.scale = [1,1]
         this.draggable = false
         this.dragging = false
@@ -189,6 +190,7 @@ class Entity {
         this.snap_x = 0
         this.snap_y = 0
         this.text_size = 3
+        this._roundness = 0
 
         for (const [key, value] of Object.entries(options)) {
             this[key] = value
@@ -315,8 +317,8 @@ class Entity {
     }
     get z() {return this._z}
     set z(value) {
-        this.el.style.zIndex = -value
         this._z = value
+        this.el.style.zIndex = -value
     }
     get xy() {return [this._x, this._y]}
     set xy(value) {
@@ -371,7 +373,7 @@ class Entity {
     get roundness() {return this._roundness}
     set roundness(value) {
         this.model.style.borderRadius = `${value*Math.min(this.model.clientWidth, this.model.clientHeight)}px`
-        this._roundness = value
+        this._roundness = clamp(value, 0, .5)
     }
     get shadow() {return this._shadow}
     set shadow(value) {
@@ -688,21 +690,14 @@ function goto_scene(scene_name, fade=True) {
 
 class HealthBar extends Entity {
     constructor(options=false) {
-        let settings = {min:0, max:100, color:'#222', scale:[.8,.05], y:.75, roundness:.25}
-        settings['default'] = settings['max']
+        let settings = {min:0, max:100, color:'#222', bar_color:'bb0505', scale:[.8,.05], y:.75, roundness:.25}
         for (const [key, value] of Object.entries(options)) {
-            if (key == 'bar_color') {continue}
             settings[key] = value
         }
         super(settings)
-        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:'red'})
+        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:settings['bar_color']})
         this.text_entity = new Entity({parent:this, text:'hii', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2})
-
-        if (('bar_color' in options)) {
-            this.bar_color = settings['bar_color']
-        }
-
-        this.value = this.default
+        this.value = settings['max']
     }
 
     get value() {return this._value}
@@ -714,7 +709,11 @@ class HealthBar extends Entity {
         this.text_entity.text = `${value} / ${this.max}`
     }
     get bar_color() {return this.bar.color}
-    set bar_color(value) {this.bar.color = value}
+    set bar_color(value) {
+        if (this.bar) {
+            this.bar.color = value
+        }
+    }
 }
 
 mouse = {x:0, y:0, position:[0,0], left:false, middle:false, hovered_entity:null,
