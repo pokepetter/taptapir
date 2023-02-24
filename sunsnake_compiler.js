@@ -307,6 +307,26 @@ function convert_arguments(line, class_name) {
         new_arguments = arguments.replace(function_definition, `[INLINE_FUNC_PLACEHOLDER]`)
     }
 
+    keys = new_arguments.split(',').map(e => e.split('=')[0])
+    if (!keys.includes('name')) {
+        if (line.includes(`= ${class_name}`)) {
+            variable_name = line.split(`= ${class_name}`)[0].trimStart()
+            if (variable_name.startsWith('let ')) {
+                variable_name = variable_name.slice(4)
+            }
+            new_arguments = `name='${variable_name}', ${new_arguments}`
+            print('variable_name:', variable_name)
+            // if line.includes(`= ${class_name}`) {
+                //
+                // }
+
+        }
+    }
+    // print('-cccccccccccccc-', keys)
+    // if ('name'  new_arguments) {
+    //
+    // }
+
     js_style_arguments = '{' + new_arguments.replaceAll('=', ':') + '}'
 
     if (has_inline_function) {

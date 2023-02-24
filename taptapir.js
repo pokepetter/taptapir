@@ -15,6 +15,7 @@ style.textContent = `
     visibility: 'visible'; display:inherit; image-rendering: pixelated;
     background-repeat:repeat;
     white-space: pre;
+
 }
 .entity:focus {
     outline: 0; -moz-outline-style: none;
@@ -156,7 +157,7 @@ class Entity {
 
         // create another div for the model, for setting origin to work
         this.el.style.backgroundColor = 'rgba(0,0,0,0)'
-        this.el.style.pointerEvents = 'none'
+        // this.el.style.pointerEvents = 'none'
         this.model = document.createElement('div')
         this.model.entity_index = entities.length
         this.model.id = 'model'
@@ -241,17 +242,10 @@ class Entity {
     set enabled(value) {
         this._enabled = value
         if (value) {
-            this.el.style.visibility = 'visible'
-            for (var c of this.children) {
-                c.el.style.visibility = c.el.style.original_visibility
-            }
+            this.el.style.display = 'inherit'
         }
         else {
-            this.el.style.visibility = 'hidden'
-            for (var c of this.children) {
-                c.el.style.original_visibility = c.el.style.visibility
-                c.el.style.visibility = 'inherit'
-            }
+            this.el.style.display = 'none'
         }
 
         if (value && this.on_enable) {
@@ -633,7 +627,7 @@ function Scene(name='', options=false) {
     for (const [key, value] of Object.entries(options)) {
         settings[key] = value
     }
-
+    settings['name'] = name
     _entity = new Entity(settings)
     _entity.bg = new Entity({parent:_entity, scale_y:aspect_ratio})
     _entity.bg.texture = name + '.jpg'
@@ -787,6 +781,7 @@ function update_mouse_position(event) {
 }
 
 function onmousemove(event) {
+    // print('move')
     update_mouse_position(event)
 
     if (!mouse.hovered_entity) {
