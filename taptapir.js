@@ -238,15 +238,24 @@ class Entity {
     get world_scale_y() {return this.el.clientHeight / scene.clientHeight}
     get world_scale() {return [this.world_scale_x, this.world_scale_y]}
 
+    get descendants() {return this.el.getElementsByTagName('*')}
+
     get enabled() {return this._enabled}
     set enabled(value) {
-        this._enabled = value
         if (value) {
-            this.el.style.display = 'inherit'
+            this.el.style.visibility = 'visible'
+            for (var c of this.descendants) {
+                c.style.visibility = c.style.original_visibility
+            }
         }
         else {
-            this.el.style.display = 'none'
+            this.el.style.visibility = 'hidden'
+            for (var c of this.descendants) {
+                c.style.original_visibility = c.style.visibility
+                c.style.visibility = 'inherit'
+            }
         }
+        this._enabled = value
 
         if (value && this.on_enable) {
             this.on_enable()
@@ -344,6 +353,10 @@ class Entity {
     get texture() {return this._texture}
     set texture(value) {
         this._texture = value
+        if (!value) {
+            this.model.style.backgroundImage = 'none'
+            return
+        }
         if (!value.endsWith('.gif')) {
             this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}")`
         }
