@@ -136,7 +136,7 @@ function compile(script) {
         lines[i] = lines[i].replaceAll('[-1]', '.at(-1)')
 
 
-        if (lines[i].includes('[') && lines[i].includes(']') && lines[i].includes(' for ') && lines[i].includes(' in ') &&  !lines[i].includes(' enumerate(')) {
+        if (lines[i].includes('[') && lines[i].endsWith(']') && lines[i].includes(' for ') && lines[i].includes(' in ')) {
             // remove part before list comprehension
             if (lines[i].includes(' = [')) {
                 code_before_list_comprehension = lines[i].split(' = [')[0] + ' = '
@@ -179,9 +179,21 @@ function compile(script) {
         }
 
         lines[i] = lines[i].replace(': {', ' {')
-        lines[i] = lines[i].replaceAll('for i, e in enumerate(', 'for [i, e] in enumerate(')
-        lines[i] = lines[i].replaceAll('for y, line in enumerate(', 'for [y, line] in enumerate(')
-        lines[i] = lines[i].replaceAll('for x, char in enumerate(', 'for [x, char] in enumerate(')
+
+        if (!lines[i].endsWith(']') && lines[i].includes('for ') && lines[i].includes(' in ')) {
+            // match 'for ?, ? in ?'
+            elements = lines[i].split('for ')[1].split(' in ')[0]
+            array = lines[i].split(' in ')[1]
+            if (elements.includes(', ')) {
+                elements = `[${elements}]`
+                if (!array.startsWith('enumerate(')) {
+                    array = `enumerate(${array.slice(0,-2)}) {`
+                }
+                lines[i] = `for ${elements} in ${array}`
+            }
+        }
+
+
         lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
 
 
@@ -359,7 +371,13 @@ round = Math.round
 sqrt = Math.sqrt
 
 function enumerate(list) {
-    return list.entries()
+    if (typeof list === 'array') {
+        return list.entries()
+    }
+    if (typeof list === 'object') {
+        return Object.entries(list)
+    }
+
 }
 
 function str(value) {
