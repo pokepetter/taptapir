@@ -21,8 +21,8 @@ function compile(script) {
     is_in_merge_lines_mode = false;
 
     for (var i=0; i<all_lines.length; i++) {
-
         if (!all_lines[i].trim()) {
+            // print('skip line')
             continue
         }
         if (all_lines[i].trimStart().startsWith('//')) {
@@ -51,7 +51,7 @@ function compile(script) {
         if (all_lines[i].trimStart().startsWith('after ') && all_lines[i].trimEnd().endsWith(':')) {
             start_indent = get_indent(all_lines[i])
             all_lines[i] = all_lines[i].replaceAll('after ', 'after(')
-            all_lines[i] = all_lines[i].slice(0, -1) + ', function()'
+            all_lines[i] = all_lines[i].slice(0,-1) + ', function()'
             for (var j=i+1; j<all_lines.length; j++) {
                 if (get_indent(all_lines[j]) <= start_indent) {
                     // if (lines[j-1].endsWith('}')) {
@@ -67,49 +67,6 @@ function compile(script) {
 
         lines.push(all_lines[i])
     }
-
-
-    // print('LINES:', lines.join('\n'))
-
-    // add brackets based on indentation
-    current_indent = 0
-    is_in_after_block = false
-
-    for (var i=0; i<lines.length; i++) {
-        if (i > 0) {
-            prev_line_indent = get_indent(lines[i-1])
-            current_line_indent = get_indent(lines[i])
-
-            if (current_line_indent > prev_line_indent) {
-                lines[i-1] += ' {'
-                current_indent = current_line_indent
-            }
-
-            if (current_line_indent < prev_line_indent) {
-                for (var j of range(current_indent - current_line_indent)) {
-                    lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
-                    if (is_in_after_block) {
-                        lines[i-1] += ')'
-                        is_in_after_block = false
-                    }
-                }
-                current_indent = current_line_indent
-            }
-
-            if (lines[i].trimStart().startsWith('after(')) {
-                is_in_after_block = true;
-            }
-        }
-    }
-    new_line = ''
-    for (var j of range(current_indent)) {
-        new_line += '' + '    '.repeat(current_indent-1) + '}'
-        if (is_in_after_block) {
-            new_line += ')'
-            is_in_after_block = false
-        }
-    }
-    lines.push(new_line)
 
     for (var i=0; i<lines.length; i++) {
         if (lines[i].trimStart().startsWith('sunsnake.define(')) {
@@ -128,15 +85,17 @@ function compile(script) {
         lines[i] = lines[i].replaceAll(' or ', ' || ')
         lines[i] = lines[i].replaceAll(' not ', ' ! ')
         lines[i] = lines[i].replaceAll('(not ', '(! ')
-        lines[i] = lines[i].replace('def ', 'function ')
-        lines[i] = lines[i].replace('def(): ', 'function() ')
+        lines[i] = lines[i].replaceAll('def ', 'function ')
+        lines[i] = lines[i].replaceAll('def():', 'function()')
         lines[i] = lines[i].replaceAll('.append(', '.push(')
         lines[i] = lines[i].replaceAll('.add(', '.push(')
         lines[i] = lines[i].replaceAll('.sum()', '.reduce((a, b) => a + b, 0)')
         lines[i] = lines[i].replaceAll('[-1]', '.at(-1)')
+        lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
 
 
-        if (lines[i].includes('[') && lines[i].endsWith(']') && lines[i].includes(' for ') && lines[i].includes(' in ')) {
+        // list comprehention
+        if (lines[i].includes('[') && lines[i].includes(']') && lines[i].includes(' for ') && lines[i].includes(' in ') && !lines[i].endsWith(':')) {
             // remove part before list comprehension
             if (lines[i].includes(' = [')) {
                 code_before_list_comprehension = lines[i].split(' = [')[0] + ' = '
@@ -178,52 +137,53 @@ function compile(script) {
             lines[i] = `${code_before_list_comprehension}${target_list}${map_code}${filter_code}${code_after_list_comprehension}`
         }
 
-        lines[i] = lines[i].replace(': {', ' {')
-
-        if (!lines[i].endsWith(']') && lines[i].includes('for ') && lines[i].includes(' in ')) {
-            // match 'for ?, ? in ?'
-            elements = lines[i].split('for ')[1].split(' in ')[0]
-            array = lines[i].split(' in ')[1]
-            if (elements.includes(', ')) {
-                elements = `[${elements}]`
-                if (!array.startsWith('enumerate(')) {
-                    array = `enumerate(${array.slice(0,-2)}) {`
-                }
-                lines[i] = `for ${elements} in ${array}`
-            }
+        if (lines[i].endsWith(':')) {
+            lines[i] = lines[i].slice(0,-1)
         }
-
-
-        lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
-
 
         // ifs
-        if (lines[i].trim().startsWith('if ') && lines[i].trim().endsWith(' {')) {
+        if (lines[i].trimStart().startsWith('if ')) {
             lines[i] = lines[i].replace('if ', 'if (')
-            lines[i] = lines[i].replace(' {', ') {')
+            lines[i] = lines[i] + ')'
         }
         // elifs
-        if (lines[i].trim().startsWith('elif ') && lines[i].trim().endsWith(' {')) {
+        else if (lines[i].trimStart().startsWith('elif ')) {
             lines[i] = lines[i].replace('elif ', 'else if (')
-            lines[i] = lines[i].replace(' {', ') {')
+            lines[i] = lines[i] + ')'
         }
 
         // dict iteration
-        if (lines[i].trimStart().startsWith('for key, value in ') && lines[i].includes('.items()')) {
+        else if (lines[i].trimStart().startsWith('for key, value in ') && lines[i].includes('.items()')) {
             var dict_name = lines[i].split('for key, value in ')[1].split('.items()')[0]
             lines[i] = lines[i].replace('for key, value in ', 'for (const [key, value] of ')
             lines[i] = lines[i].replace(`${dict_name}.items()`, `Object.entries(${dict_name}))`)
-            }
+        }
 
         // for loops
         else if (lines[i].trimStart().startsWith('for ') && lines[i].includes(' in ')) {
-            lines[i] = lines[i].replace('for ', 'for (var ')
-            lines[i] = lines[i].replace(' in ', ' of ')
-            lines[i] = lines[i].replace(' {', ') {')
+            start = lines[i].split('for ')[0]   // keep indentation
+            elements = lines[i].split('for ')[1].split(' in ')[0]
+            array = lines[i].split(' in ')[1]
+
+            // normal for loop
+            if (!elements.includes(', ')) {
+                lines[i] = lines[i].replace('for ', 'for (var ')
+                lines[i] = lines[i].replace(' in ', ' of ')
+                lines[i] = lines[i] + ')'
+            }
+            // auto enumerate, match 'for ?, ? in ?'
+            else {
+                elements = `[${elements}]`
+                if (!array.startsWith('enumerate(')) {
+                    array = `enumerate(${array})`
+                }
+                lines[i] = `${start}for (${elements} of ${array})`
+            }
 
         }
+
         // is in list
-        else if (lines[i].includes(' in ')) {
+        if (lines[i].includes(' in ') && !lines[i].includes('for ')) {
             word_before_in = lines[i].split(' in ')[0].split(' ').pop()
             if (word_before_in.startsWith('(')) {
                 word_before_in = word_before_in.slice(1) // remove first and last
@@ -231,7 +191,7 @@ function compile(script) {
             // print('word before:', word_before_in)
             word_after_in =  lines[i].split(' in ')[1].split(' ')[0]
             if (word_after_in.endsWith(')') && !word_after_in.endsWith('()')) {
-                word_after_in = word_after_in.slice(0, -1)
+                word_after_in = word_after_in.slice(0,-1)
             }
             // print('word after:', word_after_in)
             lines[i] = lines[i].replace(`${word_before_in} in ${word_after_in}`, `${word_after_in}.includes(${word_before_in})`)
@@ -265,6 +225,47 @@ function compile(script) {
             lines[i] = lines[i].replaceAll(` in ${n}:`, ` in range(${n}):`)
         }
     }
+
+    // add brackets based on indentation
+    current_indent = 0
+    is_in_after_block = false
+
+    for (var i=0; i<lines.length; i++) {
+        if (i > 0) {
+            prev_line_indent = get_indent(lines[i-1])
+            current_line_indent = get_indent(lines[i])
+
+            if (current_line_indent > prev_line_indent) {
+                lines[i-1] += ' {'
+                current_indent = current_line_indent
+            }
+
+            if (current_line_indent < prev_line_indent) {
+                for (var j of range(current_indent - current_line_indent)) {
+                    lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
+                    if (is_in_after_block) {
+                        lines[i-1] += ')'
+                        is_in_after_block = false
+                    }
+                }
+                current_indent = current_line_indent
+            }
+
+            if (lines[i].trimStart().startsWith('after(')) {
+                is_in_after_block = true;
+            }
+        }
+    }
+    new_line = ''
+    for (var j of range(current_indent)) {
+        new_line += '' + '    '.repeat(current_indent-1) + '}'
+        if (is_in_after_block) {
+            new_line += ')'
+            is_in_after_block = false
+        }
+    }
+    lines.push(new_line)
+
 
     var compiled_code = lines.join('\n')
 
@@ -310,12 +311,12 @@ function convert_arguments(line, class_name) {
     new_arguments = arguments
     has_inline_function = false
 
-    if (arguments.includes(`def():`)) {
+    if (arguments.includes(`function()`)) {
         has_inline_function = true
-        func_content = arguments.split('def():')[1]
+        func_content = arguments.split('function()')[1]
         lastIndex = arguments.lastIndexOf(')')
         func_content = func_content.substr(0, lastIndex) + func_content.substr(lastIndex)
-        function_definition = 'def():' + func_content
+        function_definition = 'function()' + func_content
         new_arguments = arguments.replace(function_definition, `[INLINE_FUNC_PLACEHOLDER]`)
     }
 
@@ -327,7 +328,7 @@ function convert_arguments(line, class_name) {
                 variable_name = variable_name.slice(4)
             }
             new_arguments = `name='${variable_name}', ${new_arguments}`
-            print('variable_name:', variable_name)
+            // print('variable_name:', variable_name)
             // if line.includes(`= ${class_name}`) {
                 //
                 // }
