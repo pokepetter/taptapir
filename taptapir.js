@@ -1107,6 +1107,7 @@ for (var i = 0; i < all_keys.length; i++) {
 }
 held_keys['mouse left'] = false
 held_keys['mouse middle'] = false
+renamed_keys = {'arrowdown':'down arrow', 'arrowup':'up arrow', 'arrowleft':'left arrow', 'arrowright':'right arrow', ' ':'space'}
 
 input = null
 function _input(event) {
@@ -1127,8 +1128,8 @@ function _input(event) {
         key = event.key.toLowerCase()
     }
 
-    if (key == ' ') {
-        key = 'space'
+    if (key in renamed_keys) {
+        key = renamed_keys[key]
     }
 
     if (event.type == "keyup") {
