@@ -499,6 +499,13 @@ class Entity {
     look_at(target_pos) {
         this.rotation = -(Math.atan2(target_pos[1] - this.y, target_pos[0] - this.x)) * (180/Math.PI)
     }
+
+    destroy_children() {
+        for (let _entity of this.children) {
+            _entity.el.remove()
+        }
+        this.children = []
+    }
 }
 
 function lerp(a, b, t) {
