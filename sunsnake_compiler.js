@@ -102,7 +102,7 @@ function compile(script) {
                 list_comprehension = lines[i].split(' = [')[1]
             }
             else {
-                code_before_list_comprehension = ''
+                code_before_list_comprehension = lines[i].split('[')[0]
                 list_comprehension = lines[i].split('[')[1]
             }
 
