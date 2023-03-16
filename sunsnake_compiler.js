@@ -155,7 +155,7 @@ function compile(script) {
         // dict iteration
         else if (lines[i].trimStart().startsWith('for key, value in ') && lines[i].includes('.items()')) {
             var dict_name = lines[i].split('for key, value in ')[1].split('.items()')[0]
-            lines[i] = lines[i].replace('for key, value in ', 'for (const [key, value] of ')
+            lines[i] = lines[i].replace('for key, value in ', 'for (let [key, value] of ')
             lines[i] = lines[i].replace(`${dict_name}.items()`, `Object.entries(${dict_name}))`)
         }
 
@@ -177,7 +177,7 @@ function compile(script) {
                 if (!array.startsWith('enumerate(')) {
                     array = `enumerate(${array})`
                 }
-                lines[i] = `${start}for (${elements} of ${array})`
+                lines[i] = `${start}for (let ${elements} of ${array})`
             }
 
         }
