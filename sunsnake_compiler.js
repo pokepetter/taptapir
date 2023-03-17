@@ -197,7 +197,7 @@ function compile(script) {
             lines[i] = lines[i].replace(`${word_before_in} in ${word_after_in}`, `${word_after_in}.includes(${word_before_in})`)
         }
 
-        for (var class_name of ['Button', 'Text']) {
+        for (var class_name of ['Button', 'Text', 'dict']) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
             }
@@ -432,6 +432,10 @@ Array.prototype.remove = function (element) {
     if (index >= 0) {
         this.splice(index, 1)
     }
+}
+
+function dict(values={}) {
+    return values
 }
 
 var scripts = document.getElementsByTagName("script")
