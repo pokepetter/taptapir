@@ -274,7 +274,7 @@ function compile(script) {
         compiled_code = compiled_code.replace(`[TEXT_CONTENT_${i}]`, `'${strings[i]}'`)
     }
 
-    print('COMPILED CODE:', compiled_code)
+    // print('COMPILED CODE:', compiled_code)
     print('compiled in', performance.now() - t, 'ms')
     return compiled_code
 }

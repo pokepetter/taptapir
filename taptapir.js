@@ -385,10 +385,15 @@ class Entity {
     get shadow() {return this._shadow}
     set shadow(value) {
         this._shadow = value
-        if (value) {
+        if (value === true) {
             this.model.style.boxShadow = "5px 20px 40px black";
         }
-        else {this.model.style.boxShadow = 'none'}
+        else if (value === false) {
+            this.model.style.boxShadow = 'none'
+        }
+        else {
+            this.model.style.boxShadow = value
+        }
     }
 
     get text() {return this.model.textContent}
