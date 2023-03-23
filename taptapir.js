@@ -130,6 +130,90 @@ function set_orientation(value) {
 set_orientation('vertical')
 
 
+function rgb(r, g, b) {return `rgb(${parseInt(r*255)},${parseInt(g*255)},${parseInt(b*255)})`}
+
+function hex_to_rgb(value) {
+    // var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    // value = value.slice(1)
+    try {
+        r = value.slice(1,3)
+        g = value.slice(3,5)
+        b = value.slice(5,7)
+        print('--', value, '-->', [parseInt(r,16), parseInt(g,16), parseInt(b,16)])
+        return [parseInt(r,16), parseInt(g,16), parseInt(b,16)]
+    }
+    catch (e) {
+        console.error('invalid hex code:', value);
+    }
+}
+// from: https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
+function hsv(h, s, v) {
+    h /= 360;
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return [parseInt(r*255), parseInt(g*255), parseInt(b*255)];
+}
+
+function rgb_to_hsv(rgb_color) {
+    r = rgb_color[0]
+    g = rgb_color[1]
+    b = rgb_color[2]
+    // It converts [0,255] format, to [0,1]
+    r = (r === 255) ? 1 : (r % 255 / parseFloat(255))
+    g = (g === 255) ? 1 : (g % 255 / parseFloat(255))
+    b = (b === 255) ? 1 : (b % 255 / parseFloat(255))
+    var max = Math.max(r, g, b)
+    var min = Math.min(r, g, b)
+    var h, s, v = max
+    var d = max - min
+    s = max === 0 ? 0 : d / max
+
+
+    switch (max) {
+        case min: h = 0; break;
+        case r: h = (g - b) + d * (g < b ? 6: 0); h /= 6 * d; break;
+        case g: h = (b - r) + d * 2; h /= 6 * d; break;
+        case b: h = (r - g) + d * 4; h /= 6 * d; break;
+    }
+    return [parseInt(h*360), s, v]
+}
+
+color = {}
+color.white =         hsv(0, 0, 1)
+color.smoke =         hsv(0, 0, 0.96)
+color.light_gray =    hsv(0, 0, 0.75)
+color.gray =          hsv(0, 0, 0.5)
+color.dark_gray =     hsv(0, 0, 0.25)
+color.black =         hsv(0, 0, 0)
+color.red =           hsv(0, 1, 1)
+color.orange =        hsv(30, 1, 1)
+color.yellow =        hsv(60, 1, 1)
+color.lime =          hsv(90, 1, 1)
+color.green =         hsv(120, 1, 1)
+color.turquoise =     hsv(150, 1, 1)
+color.cyan =          hsv(180, 1, 1)
+color.azure =         hsv(210, 1, 1)
+color.blue =          hsv(240, 1, 1)
+color.violet =        hsv(270, 1, 1)
+color.magenta =       hsv(300, 1, 1)
+color.pink =          hsv(330, 1, 1)
+color.clear =         [0, 0, 0, 0]
+
 function set_window_color(value) {game_window.style.backgroundColor = value}
 function set_background_color(value) {document.body.style.backgroundColor = value}
 function set_scale(value) {
@@ -173,7 +257,7 @@ class Entity {
         this._enabled = true
         this.on_enable = null
         this.on_disable = null
-        this.color = 'white'
+        this.color = '#ffffff'
         this.x = 0
         this.y = 0
         this.z = 0
@@ -268,7 +352,7 @@ class Entity {
     get visible_self() {return this._visible_self}
     set visible_self(value) {
         if (!value) {
-            this.color = 'rgba(0,0,0,0)'
+            this.color = [0,0,0,0]
             this.model.color = 'rgba(0,0,0,0)'
             this.text_color = 'rgba(0,0,0,0)'
         }
@@ -280,16 +364,15 @@ class Entity {
     }
     get color() {return this._color}
     set color(value) {
-        this._color = value
-        if (!(typeof value == "string")) {
-            // print('set color:', value)
-            var alpha = 255
-            if (value.length == 4) {
-                alpha = value[3]
-            }
-            value = `rgba(${value[0]},${value[1]},${value[2]},${alpha})`
+        if (typeof value == "string" && value.startsWith('#')) {
+            value = hex_to_rgb(value)
         }
-        this.model.style.backgroundColor = value
+        if (value.length == 3) {
+            value = [value[0], value[1], value[2], 255]
+        }
+        // print('set color:', value)
+        this._color = value
+        this.model.style.backgroundColor = `rgba(${value[0]},${value[1]},${value[2]},${value[3]})`
     }
     get scale_x() {return this._scale_x}
     set scale_x(value) {
@@ -429,9 +512,8 @@ class Entity {
 
     get alpha() {return this.model.style.opacity}
     set alpha(value) {
-        // print('set opac', value)
-        this.model.style.opacity = value
         this._alpha = value
+        this.model.style.opacity = value
     }
     get padding() {return this._padding}
     set padding(value) {
@@ -613,7 +695,7 @@ class Camera{
   }
 }
 camera = new Camera({})
-camera.ui = new Entity({parent:camera, name:'ui', scale:[1,1], visible_self:false, z:-100, color:'#00ffff00'})
+camera.ui = new Entity({parent:camera, name:'ui', scale:[1,1], visible_self:false, z:-100, color:color.clear})
 
 function Button(options) {
     if (!('parent' in options)) {
@@ -661,7 +743,7 @@ function Scene(name='', options=false) {
 }
 class StateHandler {
     constructor (states, fade) {
-        this.overlay = new Entity({parent:camera, name:'overlay', color:'black', alpha:0, z:-1, scale:[1,aspect_ratio]})
+        this.overlay = new Entity({parent:camera, name:'overlay', color:color.clear, alpha:0, z:-1, scale:[1,aspect_ratio]})
         this.states = states
         this.fade = fade
         this.state = Object.keys(states)[0]
@@ -709,13 +791,13 @@ function goto_scene(scene_name, fade=True) {
 
 class HealthBar extends Entity {
     constructor(options=false) {
-        let settings = {min:0, max:100, color:'#222', bar_color:'bb0505', scale:[.8,.05], y:.75, roundness:.25}
+        let settings = {min:0, max:100, color:'#222222', bar_color:'bb0505', scale:[.8,.05], y:.75, roundness:.25}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
         super(settings)
         this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:settings['bar_color']})
-        this.text_entity = new Entity({parent:this, text:'hii', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2})
+        this.text_entity = new Entity({parent:this, text:'hii', text_color:'#dddddd', color:color.clear, text_origin:[0,0], text_size:2})
         this.value = settings['max']
     }
 
@@ -855,83 +937,6 @@ function onmousemove(event) {
 
 document.addEventListener('pointermove', onmousemove)
 
-function rgb(r, g, b) {return `rgb(${parseInt(r*255)},${parseInt(g*255)},${parseInt(b*255)})`}
-
-function hex_to_rgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
-}
-// from: https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
-function hsv(h, s, v) {
-    h /= 360;
-    var r, g, b, i, f, p, q, t;
-    if (arguments.length === 1) {
-        s = h.s, v = h.v, h = h.h;
-    }
-    i = Math.floor(h * 6);
-    f = h * 6 - i;
-    p = v * (1 - s);
-    q = v * (1 - f * s);
-    t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-        case 0: r = v, g = t, b = p; break;
-        case 1: r = q, g = v, b = p; break;
-        case 2: r = p, g = v, b = t; break;
-        case 3: r = p, g = q, b = v; break;
-        case 4: r = t, g = p, b = v; break;
-        case 5: r = v, g = p, b = q; break;
-    }
-    return [parseInt(r*255), parseInt(g*255), parseInt(b*255)];
-}
-
-function rgb_to_hsv(rgb_color) {
-    r = rgb_color[0]
-    g = rgb_color[1]
-    b = rgb_color[2]
-    // It converts [0,255] format, to [0,1]
-    r = (r === 255) ? 1 : (r % 255 / parseFloat(255))
-    g = (g === 255) ? 1 : (g % 255 / parseFloat(255))
-    b = (b === 255) ? 1 : (b % 255 / parseFloat(255))
-    var max = Math.max(r, g, b)
-    var min = Math.min(r, g, b)
-    var h, s, v = max
-    var d = max - min
-    s = max === 0 ? 0 : d / max
-
-
-    switch (max) {
-        case min: h = 0; break;
-        case r: h = (g - b) + d * (g < b ? 6: 0); h /= 6 * d; break;
-        case g: h = (b - r) + d * 2; h /= 6 * d; break;
-        case b: h = (r - g) + d * 4; h /= 6 * d; break;
-    }
-    return [parseInt(h*360), s, v]
-}
-
-color = {}
-color.white =         hsv(0, 0, 1)
-color.smoke =         hsv(0, 0, 0.96)
-color.light_gray =    hsv(0, 0, 0.75)
-color.gray =          hsv(0, 0, 0.5)
-color.dark_gray =     hsv(0, 0, 0.25)
-color.black =         hsv(0, 0, 0)
-color.red =           hsv(0, 1, 1)
-color.orange =        hsv(30, 1, 1)
-color.yellow =        hsv(60, 1, 1)
-color.lime =          hsv(90, 1, 1)
-color.green =         hsv(120, 1, 1)
-color.turquoise =     hsv(150, 1, 1)
-color.cyan =          hsv(180, 1, 1)
-color.azure =         hsv(210, 1, 1)
-color.blue =          hsv(240, 1, 1)
-color.violet =        hsv(270, 1, 1)
-color.magenta =       hsv(300, 1, 1)
-color.pink =          hsv(330, 1, 1)
-color.clear =         '#00000000'
 // palette = [
 //     '#000000', '#1D2B53', '#7E2553', '#008751', '#AB5236', '#5F574F', '#C2C3C7', '#FFF1E8',
 //     '#FF004D', '#FFA300', '#FFEC27', '#00E436', '#29ADFF', '#83769C', '#FF77A8', '#FFCCAA'
@@ -1164,7 +1169,7 @@ document.addEventListener('mousewheel', _input); // modern desktop
 
 
 // triple click in the lower right to enter fullscreen
-hidden_fullscreen_button = new Button({parent:camera.ui, xy:bottom_right, roundness:.5, color:'red', last_pressed_timestamp:-1, sequential_taps:0, visible_self:false})
+hidden_fullscreen_button = new Button({parent:camera.ui, xy:bottom_right, roundness:.5, color:color.red, last_pressed_timestamp:-1, sequential_taps:0, visible_self:false})
 hidden_fullscreen_button.on_click = function() {
     // print(time - hidden_fullscreen_button.last_pressed_timestamp)
     if (time - hidden_fullscreen_button.last_pressed_timestamp < .25) {
