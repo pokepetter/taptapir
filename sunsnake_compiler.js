@@ -353,6 +353,10 @@ function len(arr) {
     return arr.length
 }
 
+function sum(arr) {
+    return arr.reduce((a, b) => a + b, 0)
+}
+
 String.prototype.count=function(c) {
   var result = 0, i = 0;
   for(i;i<this.length;i++)if(this[i]==c)result++;
