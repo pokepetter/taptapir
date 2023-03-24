@@ -133,13 +133,10 @@ set_orientation('vertical')
 function rgb(r, g, b) {return `rgb(${parseInt(r*255)},${parseInt(g*255)},${parseInt(b*255)})`}
 
 function hex_to_rgb(value) {
-    // var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    // value = value.slice(1)
     try {
         r = value.slice(1,3)
         g = value.slice(3,5)
         b = value.slice(5,7)
-        print('--', value, '-->', [parseInt(r,16), parseInt(g,16), parseInt(b,16)])
         return [parseInt(r,16), parseInt(g,16), parseInt(b,16)]
     }
     catch (e) {
