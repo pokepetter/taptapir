@@ -45,6 +45,17 @@ body {
     transform: translate(-50%, -5%);
     text-align: center;
 }
+input {
+    pointer-events: auto;
+    height: 100%;
+    width: 100%;
+    font-size: inherit;
+    font-family: monospace;
+    border-radius: inherit;
+    background-color: inherit;
+    border-width: inherit;
+    text-indent: .5em;
+}
 `
 document.head.append(style)
 
@@ -233,18 +244,21 @@ entities = []
 
 class Entity {
     constructor(options=null) {
-        this.el = document.createElement('entity')
-        this.el.className = 'entity'
+        if (!('type' in options)) {
+            options['type'] = 'entity'
+        }
+        this.el = document.createElement(options['type'])
+        this.el.className = options['type']
 
         // create another div for the model, for setting origin to work
         this.el.style.backgroundColor = 'rgba(0,0,0,0)'
         // this.el.style.pointerEvents = 'none'
-        this.model = document.createElement('div')
+        this.model = document.createElement(options['type'])
         this.model.entity_index = entities.length
         this.model.id = 'model'
         this.el.appendChild(this.model)
 
-        this.model.className = 'entity'
+        this.model.className = options['type']
         this.model.style.opacity = 1
         entities.push(this)
 
@@ -788,7 +802,7 @@ function goto_scene(scene_name, fade=True) {
 
 class HealthBar extends Entity {
     constructor(options=false) {
-        let settings = {min:0, max:100, color:'#222222', bar_color:'bb0505', scale:[.8,.05], y:.75, roundness:.25}
+        let settings = {min:0, max:100, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
@@ -813,6 +827,41 @@ class HealthBar extends Entity {
         }
     }
 }
+class RainbowSlider extends Entity {
+    constructor(options=false) {
+        let settings = {min:1, max:5, default:1, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25, show_text:false}
+        print('----', Object.entries(options))
+        for (const [key, value] of Object.entries(options)) {
+            print(key, value)
+            settings[key] = value
+        }
+        super(settings)
+        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:settings['bar_color']})
+        this.text_entity = new Entity({parent:this, text:'000', text_color:'#dddddd', color:color.clear, text_origin:[0,0], text_size:2, enabled:settings['show_text']})
+        this.gradient = ['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa']
+        this.value = settings['default']
+
+        this.on_click = function () {
+            this.value = int((mouse.point[0]+.5+.2) * this.max)
+        }
+    }
+
+    get value() {return this._value}
+    set value(value) {
+        value = clamp(value, this.min, this.max)
+        this._value = value
+        this.bar.scale_x = value / this.max
+        this.text_entity.text = `${value} / ${this.max}`
+        this.bar.color = this.gradient[int(value)-1]
+    }
+    get bar_color() {return this.bar.color}
+    set bar_color(value) {
+        if (this.bar) {
+            this.bar.color = value
+        }
+    }
+}
+
 
 mouse = {x:0, y:0, position:[0,0], left:false, middle:false, hovered_entity:null,
     set texture(name) {     // TODO: fix this
@@ -1075,8 +1124,8 @@ function destroy(_entity) {
     delete _entity
 }
 
-function save_system_save(name, value) {localStorage.setItem(name, value)}
-function save_system_load(name) {return localStorage.getItem(name)}
+function save_system_save(name, value) {localStorage.setItem(name, JSON.stringify(value))}
+function save_system_load(name) {try {return JSON.parse(localStorage.getItem(name))} catch (err) {print(err); return false}}
 function save_system_clear() {localStorage.clear()}
 
 savesystem = {save:save_system_save, load:save_system_load, clear:save_system_clear}
