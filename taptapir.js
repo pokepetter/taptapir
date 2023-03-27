@@ -829,7 +829,7 @@ class HealthBar extends Entity {
 }
 class RainbowSlider extends Entity {
     constructor(options=false) {
-        let settings = {min:1, max:5, default:1, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25, show_text:false}
+        let settings = {min:1, max:5, default:1, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false}
         print('----', Object.entries(options))
         for (const [key, value] of Object.entries(options)) {
             print(key, value)
@@ -841,8 +841,18 @@ class RainbowSlider extends Entity {
         this.gradient = ['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa']
         this.value = settings['default']
 
+        if (settings['show_lines']) {
+            this.texture= 'tile.png'
+            this.tileset_size = [1/settings['max'],1]
+        }
+
         this.on_click = function () {
-            this.value = int((mouse.point[0]+.5+.2) * this.max)
+            this.value = int((mouse.point[0]+.5+(1/this.max)) * this.max)
+        }
+        this.update = function () {
+            if (mouse.left && mouse.hovered_entity == this) {
+                this.on_click()
+            }
         }
     }
 
@@ -852,7 +862,10 @@ class RainbowSlider extends Entity {
         this._value = value
         this.bar.scale_x = value / this.max
         this.text_entity.text = `${value} / ${this.max}`
-        this.bar.color = this.gradient[int(value)-1]
+        this.bar.color = this.gradient[clamp(int(value)-1, 0, len(this.gradient)-1)]
+        if (this.on_value_changed) {
+            this.on_value_changed()
+        }
     }
     get bar_color() {return this.bar.color}
     set bar_color(value) {
