@@ -486,7 +486,7 @@ class Entity {
             this.model.style.boxShadow = 'none'
         }
         else {
-            this.model.style.boxShadow = value
+            this.el.style.boxShadow = value
         }
     }
 
