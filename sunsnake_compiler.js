@@ -7,6 +7,7 @@ function compile(script) {
     script = script.replaceAll('(\n', '(')
     script = script.replaceAll('{\n', '{')
     script = script.replaceAll('[\n', '[')
+    script = script.replaceAll(' == ', ' === ')
 
     script = script.replaceAll('.index(', '.indexOf(')
 

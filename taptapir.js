@@ -451,12 +451,22 @@ class Entity {
             this.model.style.backgroundImage = 'none'
             return
         }
-        if (!value.endsWith('.gif')) {
+
+        if (!value.endsWith('.gif') && !value.startsWith('data:')) {    // static image
             this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}")`
+            return
         }
-        else {
+
+        if (value.endsWith('.gif')) {   // .gif (ensure animation replays on reuse)
             this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+            return
         }
+
+        if (value.startsWith('data:')) {
+            this.model.style.backgroundImage = `url("${value}")`
+            return
+        }
+
         this.visible_self = false
     }
 
