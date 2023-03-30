@@ -247,6 +247,19 @@ class Entity {
         if (!('type' in options)) {
             options['type'] = 'entity'
         }
+        this.add_to_scene = true
+        if ('add_to_scene' in options) {
+            this.add_to_scene = options['add_to_scene']
+        }
+        if (!this.add_to_scene) {
+            this.el = document.createElement(options['type'])
+            entities.push(this)
+            for (const [key, value] of Object.entries(options)) {
+                this[key] = value
+            }
+            return
+        }
+
         this.el = document.createElement(options['type'])
         this.el.className = options['type']
 
