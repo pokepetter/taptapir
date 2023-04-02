@@ -263,7 +263,9 @@ class Entity {
         entities.push(this)
 
         this.setTimeout_calls = {}
-        scene.appendChild(this.el)
+        if (!('render' in options) || options['render']) {
+            scene.appendChild(this.el)
+        }
         this.children = []
         this._enabled = true
         this.on_enable = null
@@ -496,7 +498,7 @@ class Entity {
             this.model.style.boxShadow = 'none'
         }
         else {
-            this.el.style.boxShadow = value
+            this.model.style.boxShadow = value
         }
     }
 
@@ -545,6 +547,14 @@ class Entity {
     get on_click() {return this._on_click}
     set on_click(value) {
         this._on_click = value
+        if (value && !this.ignore_collision) {
+            this.model.style.pointerEvents = 'auto'
+        }
+        else {this.model.style.pointerEvents = 'none'}
+    }
+    get on_double_click() {return this.ondblclick}
+    set on_double_click(value) {
+        this.ondblclick = value
         if (value && !this.ignore_collision) {
             this.model.style.pointerEvents = 'auto'
         }
@@ -840,9 +850,7 @@ class HealthBar extends Entity {
 class RainbowSlider extends Entity {
     constructor(options=false) {
         let settings = {min:1, max:5, default:1, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false}
-        print('----', Object.entries(options))
         for (const [key, value] of Object.entries(options)) {
-            print(key, value)
             settings[key] = value
         }
         super(settings)
