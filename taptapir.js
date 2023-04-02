@@ -893,6 +893,31 @@ class RainbowSlider extends Entity {
     }
 }
 
+class InputField extends Entity {
+    constructor(options=false) {
+        let settings = {roundness:.5, color:color.smoke, text_size:2, text_color:color.azure, value:''}
+        for (const [key, value] of Object.entries(options)) {
+            settings[key] = value
+        }
+        super(settings)
+        this.input_field = document.createElement('input')
+        this.model.appendChild(this.input_field)
+        this.input_field.onkeyup = () => {
+            if (this.on_value_changed) {
+                this.on_value_changed()
+            }
+        }
+        this.value = settings['value']
+    }
+
+    get value() {return this.input_field.value}
+    set value(x) {
+        if (this.input_field) {
+            this.input_field.value = x
+        }
+    }
+}
+
 
 mouse = {x:0, y:0, position:[0,0], left:false, middle:false, hovered_entity:null,
     set texture(name) {     // TODO: fix this

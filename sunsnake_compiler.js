@@ -207,7 +207,7 @@ function compile(script) {
             }
         }
 
-        for (var class_name of ['Entity', 'HealthBar', 'RainbowSlider']) {
+        for (var class_name of ['Entity', 'HealthBar', 'RainbowSlider', 'InputField']) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
             }
