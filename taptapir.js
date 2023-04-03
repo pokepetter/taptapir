@@ -534,7 +534,7 @@ class Entity {
     get text_size() {return this._text_size}
     set text_size(value) {
         this._text_size = value
-        this.model.style.fontSize = `${value}vh`
+        this.model.style.fontSize = `${value*scale}vh`
     }
 
     get text_origin() {return this._text_origin}
@@ -862,15 +862,16 @@ class HealthBar extends Entity {
 }
 class RainbowSlider extends Entity {
     constructor(options=false) {
-        let settings = {min:1, max:5, default:1, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false}
+        let settings = {min:1, max:5, default:1, color:'#222222', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
         super(settings)
-        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:settings['bar_color']})
+        this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25})
         this.text_entity = new Entity({parent:this, text:'000', text_color:'#dddddd', color:color.clear, text_origin:[0,0], text_size:2, enabled:settings['show_text']})
-        this.gradient = ['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa']
+        this.gradient = settings['gradient']
         this.value = settings['default']
+        // this.color = settings['color']
 
         if (settings['show_lines']) {
             this.texture= 'tile.png'
@@ -896,12 +897,6 @@ class RainbowSlider extends Entity {
         this.bar.color = this.gradient[clamp(int(value)-1, 0, len(this.gradient)-1)]
         if (this.on_value_changed) {
             this.on_value_changed()
-        }
-    }
-    get bar_color() {return this.bar.color}
-    set bar_color(value) {
-        if (this.bar) {
-            this.bar.color = value
         }
     }
 }
