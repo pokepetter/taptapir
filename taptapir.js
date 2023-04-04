@@ -979,16 +979,16 @@ function mouseup(event) {
     print(mouse.position[0] - mouse.click_start_position[0])
     diff_x = mouse.position[0] - mouse.click_start_position[0]
     diff_y = mouse.position[1] - mouse.click_start_position[1]
-    if (diff_x < -.25 && abs(diff_y) < .15) {
+    if (diff_x < -.1 && abs(diff_y) < .15) {
         _input('swipe left')
     }
-    if (diff_x > .25 && abs(diff_y) < .15) {
+    if (diff_x > .1 && abs(diff_y) < .15) {
         _input('swipe right')
     }
-    if (diff_y > .25 && abs(diff_x) < .15) {
+    if (diff_y > .1 && abs(diff_x) < .15) {
         _input('swipe up')
     }
-    if (diff_y < -.25 && abs(diff_x) < .15) {
+    if (diff_y < -.1 && abs(diff_x) < .15) {
         _input('swipe down')
     }
 
