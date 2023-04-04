@@ -955,6 +955,7 @@ function handle_mouse_click(e) {
     mouse.left = true
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
     entity = entities[element_hit.entity_index]
+    mouse.click_start_position = mouse.position
 
     // print(element_hit)
     if (element_hit && entity) {
@@ -974,6 +975,23 @@ function handle_mouse_click(e) {
 
 function mouseup(event) {
     // event.preventDefault()
+    mouse.click_end_position = mouse.position
+    print(mouse.position[0] - mouse.click_start_position[0])
+    diff_x = mouse.position[0] - mouse.click_start_position[0]
+    diff_y = mouse.position[1] - mouse.click_start_position[1]
+    if (diff_x < -.25 && abs(diff_y) < .15) {
+        _input('swipe left')
+    }
+    if (diff_x > .25 && abs(diff_y) < .15) {
+        _input('swipe right')
+    }
+    if (diff_y > .25 && abs(diff_x) < .15) {
+        _input('swipe up')
+    }
+    if (diff_y < -.25 && abs(diff_x) < .15) {
+        _input('swipe down')
+    }
+
     _input(event)
     mouse.left = false;
     for (var e of entities) {
@@ -1227,32 +1245,37 @@ for (var i = 0; i < all_keys.length; i++) {
 }
 held_keys['mouse left'] = false
 held_keys['mouse middle'] = false
-renamed_keys = {'arrowdown':'down arrow', 'arrowup':'up arrow', 'arrowleft':'left arrow', 'arrowright':'right arrow', ' ':'space'}
+_renamed_keys = {'arrowdown':'down arrow', 'arrowup':'up arrow', 'arrowleft':'left arrow', 'arrowright':'right arrow', ' ':'space'}
 
 input = null
 function _input(event) {
-    if (event.type == 'mousewheel') {
-        if (event.deltaY > 0) {key = 'scroll down'}
-        else {key = 'scroll up'}
+    if (event instanceof Event) {
+        if (event.type == 'mousewheel') {
+            if (event.deltaY > 0) {key = 'scroll down'}
+            else {key = 'scroll up'}
+        }
+        else if (event.type == 'pointerdown') {
+            if (event.button == 0) {key = 'left mouse down'; mouse.left=true; held_keys['mouse left']=true}
+            else if (event.button == 1) {key = 'middle mouse down'; mouse.middle=true; held_keys['mouse middle']=true}
+        }
+        else if (event.type == 'pointerup') {
+            if (event.button == 0) {key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false}
+            else if (event.button == 1) {key = 'middle mouse up'; mouse.middle=false; held_keys['mouse middle']=false}
+        }
+
+        else {
+            key = event.key.toLowerCase()
+        }
     }
-    else if (event.type == 'pointerdown') {
-        if (event.button == 0) {key = 'left mouse down'; mouse.left=true; held_keys['mouse left']=true}
-        else if (event.button == 1) {key = 'middle mouse down'; mouse.middle=true; held_keys['mouse middle']=true}
-    }
-    else if (event.type == 'pointerup') {
-        if (event.button == 0) {key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false}
-        else if (event.button == 1) {key = 'middle mouse up'; mouse.middle=false; held_keys['mouse middle']=false}
+    else {  // is already a string, like swipe left, etc.
+        key = event
     }
 
-    else {
-        key = event.key.toLowerCase()
+    if (key in _renamed_keys) {
+        key = _renamed_keys[key]
     }
 
-    if (key in renamed_keys) {
-        key = renamed_keys[key]
-    }
-
-    if (event.type == "keyup") {
+    if ((event instanceof Event) && event.type == "keyup") {
         held_keys[key] = 0
         key = key + ' up'
     }
