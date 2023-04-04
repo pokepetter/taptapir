@@ -955,8 +955,12 @@ function handle_mouse_click(e) {
     mouse.left = true
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
     entity = entities[element_hit.entity_index]
-    mouse.click_start_position = mouse.position
-    time_of_press = time
+    print(element_hit, entity.on_click)
+    if (!element_hit || (entity.on_click === undefined)) {
+        mouse.swipe_start_position = mouse.position
+        print('.-', time)
+        time_of_press = time
+    }
 
     // print(element_hit)
     if (element_hit && entity) {
@@ -975,11 +979,11 @@ function handle_mouse_click(e) {
 }
 
 function mouseup(event) {
-    // event.preventDefault()
     mouse.click_end_position = mouse.position
-    diff_x = mouse.position[0] - mouse.click_start_position[0]
-    diff_y = mouse.position[1] - mouse.click_start_position[1]
     if (time - time_of_press < .15) {
+        diff_x = mouse.position[0] - mouse.swipe_start_position[0]
+        diff_y = mouse.position[1] - mouse.swipe_start_position[1]
+
         if (diff_x < -.05 && abs(diff_y) < .15) {
             _input('swipe left')
         }
