@@ -956,6 +956,7 @@ function handle_mouse_click(e) {
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
     entity = entities[element_hit.entity_index]
     mouse.click_start_position = mouse.position
+    time_of_press = time
 
     // print(element_hit)
     if (element_hit && entity) {
@@ -976,20 +977,21 @@ function handle_mouse_click(e) {
 function mouseup(event) {
     // event.preventDefault()
     mouse.click_end_position = mouse.position
-    print(mouse.position[0] - mouse.click_start_position[0])
     diff_x = mouse.position[0] - mouse.click_start_position[0]
     diff_y = mouse.position[1] - mouse.click_start_position[1]
-    if (diff_x < -.1 && abs(diff_y) < .15) {
-        _input('swipe left')
-    }
-    if (diff_x > .1 && abs(diff_y) < .15) {
-        _input('swipe right')
-    }
-    if (diff_y > .1 && abs(diff_x) < .15) {
-        _input('swipe up')
-    }
-    if (diff_y < -.1 && abs(diff_x) < .15) {
-        _input('swipe down')
+    if (time - time_of_press < .15) {
+        if (diff_x < -.05 && abs(diff_y) < .15) {
+            _input('swipe left')
+        }
+        if (diff_x > .05 && abs(diff_y) < .15) {
+            _input('swipe right')
+        }
+        if (diff_y > .05 && abs(diff_x) < .15) {
+            _input('swipe up')
+        }
+        if (diff_y < -.05 && abs(diff_x) < .15) {
+            _input('swipe down')
+        }
     }
 
     _input(event)
