@@ -951,14 +951,14 @@ function mousedown(event) {
 document.addEventListener('pointerdown', mousedown)
 
 
+time_of_press = 0
 function handle_mouse_click(e) {
     mouse.left = true
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
     entity = entities[element_hit.entity_index]
-    print(element_hit, entity.on_click)
-    if (!element_hit || (entity.on_click === undefined)) {
+    // print(element_hit, entity.on_click)
+    if (!element_hit || entity === undefined || entity.on_click === undefined) {
         mouse.swipe_start_position = mouse.position
-        print('.-', time)
         time_of_press = time
     }
 
@@ -1207,7 +1207,9 @@ function sample(population, k){
 }
 
 function destroy(_entity) {
-    _entity.parent.children.remove(_entity)
+    if (_entity._parent) {
+        _entity.parent.children.remove(_entity)
+    }
     _entity.el.remove()
     delete _entity
 }
