@@ -469,20 +469,21 @@ class Entity {
 
         if (!value.endsWith('.gif') && !value.startsWith('data:')) {    // static image
             this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}")`
+            this.visible_self = false
             return
         }
 
         if (value.endsWith('.gif')) {   // .gif (ensure animation replays on reuse)
             this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+            this.visible_self = false
             return
         }
 
         if (value.startsWith('data:')) {
             this.model.style.backgroundImage = `url("${value}")`
+            this.visible_self = false
             return
         }
-
-        this.visible_self = false
     }
 
     get tileset_size() {return this._tileset_size}
