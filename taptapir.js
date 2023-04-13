@@ -1256,7 +1256,7 @@ _renamed_keys = {'arrowdown':'down arrow', 'arrowup':'up arrow', 'arrowleft':'le
 input = null
 function _input(event) {
     if (event instanceof Event) {
-        if (event.type == 'mousewheel') {
+        if (event.type == 'wheel') {
             if (event.deltaY > 0) {key = 'scroll down'}
             else {key = 'scroll up'}
         }
@@ -1304,7 +1304,7 @@ function _input(event) {
 }
 document.addEventListener('keydown', _input)
 document.addEventListener('keyup', _input)
-document.addEventListener('mousewheel', _input); // modern desktop
+document.addEventListener('wheel', _input); // modern desktop
 
 
 // triple click in the lower right to enter fullscreen
