@@ -229,7 +229,7 @@ function compile(script) {
 
     // add brackets based on indentation
     current_indent = 0
-    is_in_after_block = false
+    is_in_after_block = 0
 
     for (var i=0; i<lines.length; i++) {
         if (i > 0) {
@@ -246,14 +246,14 @@ function compile(script) {
                     lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
                     if (is_in_after_block) {
                         lines[i-1] += ')'
-                        is_in_after_block = false
+                        is_in_after_block -= 1
                     }
                 }
                 current_indent = current_line_indent
             }
 
             if (lines[i].trimStart().startsWith('after(')) {
-                is_in_after_block = true;
+                is_in_after_block += 1;
             }
         }
     }
@@ -262,7 +262,7 @@ function compile(script) {
         new_line += '' + '    '.repeat(current_indent-1) + '}'
         if (is_in_after_block) {
             new_line += ')'
-            is_in_after_block = false
+            is_in_after_block -= 1
         }
     }
     lines.push(new_line)
