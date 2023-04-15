@@ -315,12 +315,17 @@ class Entity {
 
     get parent() {return this._parent}
     set parent(value) {
-        value.el.appendChild(this.el)
-        if (this._parent) {
+        if (value === scene || value === null) {
+            value.appendChild(this.el)
+        }
+        else {
+            value.el.appendChild(this.el)
+        }
+        if (this._parent && this._parent._children) {
             this._parent.children.remove(self)
         }
         this._parent = value
-        if (!value.children.includes(this)) {
+        if (value._children && !value.children.includes(this)) {
             value.children.push(this)
         }
     }
