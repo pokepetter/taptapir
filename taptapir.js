@@ -315,7 +315,10 @@ class Entity {
 
     get parent() {return this._parent}
     set parent(value) {
-        if (value === scene || value === null) {
+        if (value == null) {
+            value = scene
+        }
+        if (value === scene) {
             value.appendChild(this.el)
         }
         else {
