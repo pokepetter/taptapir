@@ -1216,8 +1216,8 @@ function sample(population, k){
 }
 
 function destroy(_entity) {
-    if (_entity._parent) {
-        _entity.parent.children.remove(_entity)
+    if (_entity._parent && _entity._parent._children) {
+        _entity._parent._children.remove(_entity)
     }
     _entity.el.remove()
     delete _entity
