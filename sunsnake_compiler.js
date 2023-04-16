@@ -94,7 +94,6 @@ function compile(script) {
         lines[i] = lines[i].replaceAll('[-1]', '.at(-1)')
         lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
 
-
         // list comprehention
         if (lines[i].includes('[') && lines[i].includes(']') && lines[i].includes(' for ') && lines[i].includes(' in ') && !lines[i].endsWith(':')) {
             // remove part before list comprehension
@@ -208,9 +207,10 @@ function compile(script) {
         }
 
         for (var class_name of ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField']) {
-            if (lines[i].includes(` ${class_name}(`)) {
+            is_first_word = lines[i].startsWith(`${class_name}(`) ? '' : ' '        // don't add space if line starts with 'Entity(', do add otherwise, to ensure we match the whole name
+            if (lines[i].includes(`${is_first_word}${class_name}(`)) {
+                lines[i] = lines[i].replace(`${is_first_word}${class_name}(`, `${is_first_word}new ${class_name}(`)
                 lines[i] = convert_arguments(lines[i], class_name)
-                lines[i] = lines[i].replace(` ${class_name}(`, ` new ${class_name}(`)
             }
         }
 
@@ -325,7 +325,6 @@ function convert_arguments(line, class_name) {
             new_arguments = `name='${variable_name}', ${new_arguments}`
         }
     }
-
     js_style_arguments = '{' + new_arguments.replaceAll('=', ':') + '}'
 
     if (has_inline_function) {
