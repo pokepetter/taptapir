@@ -198,7 +198,7 @@ function compile(script) {
             lines[i] = lines[i].replace(`${word_before_in} in ${word_after_in}`, `${word_after_in}.includes(${word_before_in})`)
         }
 
-        for (var class_name of ['Text', 'dict']) {
+        for (var class_name of ['dict', ]) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
             }
