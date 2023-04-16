@@ -144,6 +144,9 @@ set_orientation('vertical')
 function rgb(r, g, b) {return `rgb(${parseInt(r*255)},${parseInt(g*255)},${parseInt(b*255)})`}
 
 function hex_to_rgb(value) {
+    if (value.length === 4) {
+        value = `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`   // convert '#333' to '#333333'
+    }
     try {
         r = value.slice(1,3)
         g = value.slice(3,5)
