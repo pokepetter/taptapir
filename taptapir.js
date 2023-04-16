@@ -750,28 +750,25 @@ class Camera{
 camera = new Camera({})
 camera.ui = new Entity({parent:camera, name:'ui', scale:[1,1], visible_self:false, z:-100, color:color.clear})
 
-function Button(options) {
-    if (!('parent' in options)) {
-        options['parent'] = camera.ui
-    }
-    if (!('scale' in options)) {
-        options['scale'] = [.2,.2]
-    }
-    if (!('roundness' in options)) {
-        options['roundness'] = .2
-    }
-    if (!('text_origin' in options)) {
-        options['text_origin'] = [0,0]
-    }
-    if ('scale' in options) {
-        if ('scale_x' in options) {
-            options['scale'][0] = options['scale_x']
+class Button extends Entity{
+    constructor(options=false) {
+        let settings = {parent:camera.ui, scale:[.2,.2], roundness:.2, text_origin:[0,0], }
+        for (const [key, value] of Object.entries(options)) {
+            settings[key] = value
         }
-        if ('scale_y' in options) {
-            options['scale'][1] = options['scale_y']
-        }
+        super(settings)
     }
-    return new Entity(options)
+}
+
+class Text extends Entity{
+    constructor(options=false) {
+        let settings = {parent:camera.ui, roundness:.05, padding:.75, z:-1, color:color.clear, scale_x:.8}
+
+        for (const [key, value] of Object.entries(options)) {
+            settings[key] = value
+        }
+        super(settings)
+    }
 }
 
 function Canvas(options) {
@@ -1123,33 +1120,6 @@ function stop_all_invokes() {
     for (let i = timeout_id; i >= 0; i--) {
         window.clearInterval(i);
     }
-}
-
-
-function Text(options) {
-    if (!'scale' in options && !'scale_x' in options) {
-        options['scale_x'] = .8
-    }
-    if ('background' in options && options['background'] && !'color' in options) {
-        if (options['background'] == true) {
-            options['color'] = '#ffffff00'
-            options['alpha'] = .9
-        }
-        else {
-            options['color'] = options['background']
-        }
-        if (!'shadow' in options) {
-            options['shadow'] = 1
-        }
-    }
-
-    defaults = {'roundness':.05, 'padding':.75, 'z':-1, 'color':color.clear}
-    for (const [key, value] of Object.entries(defaults)) {
-        if (!(key in options)) {
-            options[key] = value
-        }
-    }
-    return new Entity(options)
 }
 
 function distance(a, b) {

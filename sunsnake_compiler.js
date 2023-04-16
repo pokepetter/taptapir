@@ -198,7 +198,7 @@ function compile(script) {
             lines[i] = lines[i].replace(`${word_before_in} in ${word_after_in}`, `${word_after_in}.includes(${word_before_in})`)
         }
 
-        for (var class_name of ['Button', 'Text', 'dict']) {
+        for (var class_name of ['Text', 'dict']) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
             }
@@ -207,7 +207,7 @@ function compile(script) {
             }
         }
 
-        for (var class_name of ['Entity', 'HealthBar', 'RainbowSlider', 'InputField']) {
+        for (var class_name of ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField']) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
             }
