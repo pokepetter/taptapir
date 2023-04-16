@@ -256,6 +256,11 @@ function compile(script) {
         }
     }
 
+    new_line = ''
+    for (var j of range(current_indent)) {
+        new_line += '' + '    '.repeat(current_indent-1) + '}'
+    }
+    lines.push(new_line)
 
     var compiled_code = lines.join('\n')
 
@@ -318,17 +323,8 @@ function convert_arguments(line, class_name) {
                 variable_name = variable_name.slice(4)
             }
             new_arguments = `name='${variable_name}', ${new_arguments}`
-            // print('variable_name:', variable_name)
-            // if line.includes(`= ${class_name}`) {
-                //
-                // }
-
         }
     }
-    // print('-cccccccccccccc-', keys)
-    // if ('name'  new_arguments) {
-    //
-    // }
 
     js_style_arguments = '{' + new_arguments.replaceAll('=', ':') + '}'
 
@@ -452,8 +448,5 @@ for (var script of scripts) {
             compiled_code = compile(script.textContent)
             eval(compiled_code)
         }
-        // else if (script.href) {
-        //     print(script)
-        // }
     }
 }
