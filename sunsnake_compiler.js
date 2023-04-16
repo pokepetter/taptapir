@@ -208,12 +208,9 @@ function compile(script) {
         }
 
         for (var class_name of ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField']) {
-            if (lines[i].includes(`${class_name}({`)) {
-                continue
-            }
-            if (lines[i].includes(`${class_name}(`)) {
+            if (lines[i].includes(` ${class_name}(`)) {
                 lines[i] = convert_arguments(lines[i], class_name)
-                lines[i] = lines[i].replace(`${class_name}(`, `new ${class_name}(`)
+                lines[i] = lines[i].replace(` ${class_name}(`, ` new ${class_name}(`)
             }
         }
 
@@ -267,7 +264,7 @@ function compile(script) {
         compiled_code = compiled_code.replace(`[TEXT_CONTENT_${i}]`, `'${strings[i]}'`)
     }
 
-    // print('COMPILED CODE:', compiled_code)
+    print('COMPILED CODE:', compiled_code)
     print('compiled in', performance.now() - t, 'ms')
     return compiled_code
 }
