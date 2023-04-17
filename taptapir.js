@@ -2,81 +2,81 @@
 scale = 1
 print = console.log
 
-var loading_text = document.getElementById('loading_text')
-if (loading_text) {
-    loading_text.remove()
+
+var _loading_text = document.getElementById('loading_text')
+if (_loading_text) {
+    _loading_text.remove()
 }
 const style = document.createElement('style')
 style.textContent = `
 .entity {
-    touch-action: none;
-    width:100%; height:100%; position:absolute; top:50%; left:50%; will-change: transform;
-    transform:translate(-50%, -50%); color:black; background-size: 100% 100%; padding:0; border-width:0px;
-    visibility: 'visible'; display:inherit; image-rendering: pixelated;
-    background-repeat:repeat;
-    white-space: pre;
-
+  touch-action: none;
+  width:100%; height:100%; position:absolute; top:50%; left:50%; will-change: transform;
+  transform:translate(-50%, -50%); color:black; background-size: 100% 100%; padding:0; border-width:0px;
+  visibility: 'visible'; display:inherit; image-rendering: pixelated;
+  background-repeat:repeat;
+  white-space: pre;
 }
 .entity:focus {
-    outline: 0; -moz-outline-style: none;
+  outline: 0; -moz-outline-style: none;
 }
 
 #game {margin:auto; background-color: darkgreen; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%); overflow: hidden; pointer-events: none;
-    width:100%; height:100%; outline: 0; box-shadow: 0; touch-action: none; user-select: none;
-    white-space: pre-wrap;
+  transform: translate(-50%, -50%); overflow: hidden; pointer-events: none;
+  width:100%; height:100%; outline: 0; box-shadow: 0; touch-action: none; user-select: none;
+  white-space: pre-wrap;
 }
 fullscreen_button {padding: 4px 4px; width: 64px; height: 64px; background-color: #555; border-radius: .2em; border-width: 0px;
-    text-decoration: none; color: white; font-size: 50.0px; z-index: 1; position: absolute; text-align: center; right: 0%;
+  text-decoration: none; color: white; font-size: 50.0px; z-index: 1; position: absolute; text-align: center; right: 0%;
 }
 body {
-    margin:0;
-    background-color:'#111';
-    font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
-    overscroll-behavior-y: contain;
+  margin:0;
+  background-color:'#111';
+  font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
+  overscroll-behavior-y: contain;
 }
 #loading_text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    color: white;
-    font-family:monospace;
-    transform: translate(-50%, -5%);
-    text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  color: white;
+  font-family:monospace;
+  transform: translate(-50%, -5%);
+  text-align: center;
 }
 input {
-    pointer-events: auto;
-    height: 100%;
-    width: 100%;
-    font-size: inherit;
-    font-family: monospace;
-    border-radius: inherit;
-    background-color: inherit;
-    border-width: inherit;
-    text-indent: .5em;
+  pointer-events: auto;
+  height: 100%;
+  width: 100%;
+  font-size: inherit;
+  font-family: monospace;
+  border-radius: inherit;
+  background-color: inherit;
+  border-width: inherit;
+  text-indent: .5em;
 }
 `
 document.head.append(style)
 
-var game_window = document.getElementById('game')
-if (!game_window) {
-    var game_window = document.createElement('game')
-    game_window.id = 'game'
+var _game_window = document.getElementById('game')
+if (!_game_window) {
+    var _game_window = document.createElement('game')
+    _game_window.id = 'game'
     if (!document.body) {
         document.body = document.createElement('body')
     }
-    document.body.appendChild(game_window)
+    document.body.appendChild(_game_window)
 }
 const scene = document.createElement('entity')
 scene.className = 'entity'
 scene.id = 'scene'
-game_window.appendChild(scene)
+_game_window.appendChild(scene)
 
 // print('browser aspect_ratio:', browser_aspect_ratio)
-var format = null
-var is_mobile = 'ontouchstart' in document.documentElement
-var fullscreen = false
+format = null
+is_mobile = 'ontouchstart' in document.documentElement
+fullscreen = false
 camera = null
 
 function set_orientation(value) {
@@ -93,14 +93,14 @@ function set_orientation(value) {
         asp_y = 9/16
 
         if (browser_aspect_ratio >= 9/16) { // if the screen is wider than the game, like a pc monitor.
-            print('vertical view desktop')
-            game_window.style.width = `${width*scale/browser_aspect_ratio/(16/9)}px`
-            game_window.style.height =  `${height*scale}px`
+            // print('vertical view desktop')
+            _game_window.style.width = `${width*scale/browser_aspect_ratio/(16/9)}px`
+            _game_window.style.height =  `${height*scale}px`
         }
         else {                              // if the screen is taller than the game, like a phone screen.
-            print('vertical view mobile')
-            game_window.style.height = `${width*scale*(16/9)}px`
-            game_window.style.width =  `${width*scale}px`
+            // print('vertical view mobile')
+            _game_window.style.height = `${width*scale*(16/9)}px`
+            _game_window.style.width =  `${width*scale}px`
         }
         if (camera) {camera.ui.scale = [1, 1/aspect_ratio]}
         top_left =      [-.5, .5*aspect_ratio]
@@ -119,12 +119,12 @@ function set_orientation(value) {
         scene.style.width = `${1/asp_x*100}%`
         scene.style.height = `${1/asp_y*100}%`
         if (browser_aspect_ratio > 16/9) { // if the screen is wider than 16/9, fit to height
-            game_window.style.height = `${height*scale}px`
-            game_window.style.width =  `${width*scale/browser_aspect_ratio*16/9}px`
+            _game_window.style.height = `${height*scale}px`
+            _game_window.style.width =  `${width*scale/browser_aspect_ratio*16/9}px`
         }
         else {                              // if the screen is taller than 16/9, fit to width
-            game_window.style.height = `${height*scale*browser_aspect_ratio/(16/9)}px`
-            game_window.style.width =  `${width*scale}px`
+            _game_window.style.height = `${height*scale*browser_aspect_ratio/(16/9)}px`
+            _game_window.style.width =  `${width*scale}px`
         }
         if (camera) {camera.ui.scale = [1/aspect_ratio, 1]}
         top_left =      [-.5*aspect_ratio, .5]
@@ -180,10 +180,10 @@ function hsv(h, s, v) {
     return [parseInt(r*255), parseInt(g*255), parseInt(b*255)];
 }
 
-function rgb_to_hsv(rgb_color) {
-    r = rgb_color[0]
-    g = rgb_color[1]
-    b = rgb_color[2]
+function rgb_to_hsv(_rgb_color) {
+    r = _rgb_color[0]
+    g = _rgb_color[1]
+    b = _rgb_color[2]
     // It converts [0,255] format, to [0,1]
     r = (r === 255) ? 1 : (r % 255 / parseFloat(255))
     g = (g === 255) ? 1 : (g % 255 / parseFloat(255))
@@ -204,28 +204,29 @@ function rgb_to_hsv(rgb_color) {
     return [parseInt(h*360), s, v]
 }
 
-color = {}
-color.white =         hsv(0, 0, 1)
-color.smoke =         hsv(0, 0, 0.96)
-color.light_gray =    hsv(0, 0, 0.75)
-color.gray =          hsv(0, 0, 0.5)
-color.dark_gray =     hsv(0, 0, 0.25)
-color.black =         hsv(0, 0, 0)
-color.red =           hsv(0, 1, 1)
-color.orange =        hsv(30, 1, 1)
-color.yellow =        hsv(60, 1, 1)
-color.lime =          hsv(90, 1, 1)
-color.green =         hsv(120, 1, 1)
-color.turquoise =     hsv(150, 1, 1)
-color.cyan =          hsv(180, 1, 1)
-color.azure =         hsv(210, 1, 1)
-color.blue =          hsv(240, 1, 1)
-color.violet =        hsv(270, 1, 1)
-color.magenta =       hsv(300, 1, 1)
-color.pink =          hsv(330, 1, 1)
-color.clear =         [0, 0, 0, 0]
+color = {
+  white:         hsv(0, 0, 1),
+  smoke:         hsv(0, 0, 0.96),
+  light_gray:    hsv(0, 0, 0.75),
+  gray:          hsv(0, 0, 0.5),
+  dark_gray:     hsv(0, 0, 0.25),
+  black:         hsv(0, 0, 0),
+  red:           hsv(0, 1, 1),
+  orange:        hsv(30, 1, 1),
+  yellow:        hsv(60, 1, 1),
+  lime:          hsv(90, 1, 1),
+  green:         hsv(120, 1, 1),
+  turquoise:     hsv(150, 1, 1),
+  cyan:          hsv(180, 1, 1),
+  azure:         hsv(210, 1, 1),
+  blue:          hsv(240, 1, 1),
+  violet:        hsv(270, 1, 1),
+  magenta:       hsv(300, 1, 1),
+  pink:          hsv(330, 1, 1),
+  clear:         [0, 0, 0, 0],
+}
 
-function set_window_color(value) {game_window.style.backgroundColor = value}
+function set_window_color(value) {_game_window.style.backgroundColor = value}
 function set_background_color(value) {document.body.style.backgroundColor = value}
 function set_scale(value) {
     scale = value
@@ -684,7 +685,7 @@ function lists_are_equal(array_a, array_b) {
 class Camera{
   constructor(options=null) {
       this.el = document.createElement('entity')
-      game_window.appendChild(this.el)
+      _game_window.appendChild(this.el)
       this.el.className = 'entity'
       // this.el.style.height = scene.style.height
       // this.el.style.width = scene.style.width
@@ -871,13 +872,13 @@ class HealthBar extends Entity {
 }
 class RainbowSlider extends Entity {
     constructor(options=false) {
-        let settings = {min:1, max:5, default:1, color:'#222222', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
+        let settings = {min:1, max:5, default:1, color:'#222', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
         super(settings)
         this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25})
-        this.text_entity = new Entity({parent:this, text:'000', text_color:'#dddddd', color:color.clear, text_origin:[0,0], text_size:2, enabled:settings['show_text']})
+        this.text_entity = new Entity({parent:this, text:'000', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2, enabled:settings['show_text']})
         this.gradient = settings['gradient']
         this.value = settings['default']
         // this.color = settings['color']
@@ -943,7 +944,7 @@ mouse = {x:0, y:0, position:[0,0], left:false, middle:false, hovered_entity:null
     }
 }
 
-function mousedown(event) {
+function _mousedown(event) {
     _input(event)
     if (event.button > 0) {
         return
@@ -954,14 +955,14 @@ function mousedown(event) {
     // else {
     //     mouse.pressure = event.originalEvent.pressure
     // }
-    update_mouse_position(event)
-    handle_mouse_click(event)
+    _update_mouse_position(event)
+    _handle_mouse_click(event)
 }
-document.addEventListener('pointerdown', mousedown)
+document.addEventListener('pointerdown', _mousedown)
 
 
 time_of_press = 0
-function handle_mouse_click(e) {
+function _handle_mouse_click(e) {
     mouse.left = true
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
     entity = entities[element_hit.entity_index]
@@ -977,17 +978,17 @@ function handle_mouse_click(e) {
             entity.on_click()
         }
         if (entity.draggable) {
-            window_position = game_window.getBoundingClientRect()
+            window_position = _game_window.getBoundingClientRect()
             entity.start_offset = [
-                ((((e.clientX - window_position.left) / game_window.clientWidth) - .5) * asp_x*camera.fov) - entity.x,
-                (-(((e.clientY - window_position.top) / game_window.clientHeight ) - .5) / asp_y*camera.fov) - entity.y
+                ((((e.clientX - window_position.left) / _game_window.clientWidth) - .5) * asp_x*camera.fov) - entity.x,
+                (-(((e.clientY - window_position.top) / _game_window.clientHeight ) - .5) / asp_y*camera.fov) - entity.y
                 ]
             entity.dragging = true
         }
     }
 }
 
-function mouseup(event) {
+function _mouseup(event) {
     mouse.click_end_position = mouse.position
     if (time - time_of_press < .15) {
         diff_x = mouse.position[0] - mouse.swipe_start_position[0]
@@ -1018,21 +1019,21 @@ function mouseup(event) {
         }
     }
 }
-document.addEventListener('pointerup', mouseup)
+document.addEventListener('pointerup', _mouseup)
 
 
-function update_mouse_position(event) {
-    window_position = game_window.getBoundingClientRect()
+function _update_mouse_position(event) {
+    window_position = _game_window.getBoundingClientRect()
     event_x = event.clientX
     event_y = event.clientY
-    mouse.x = (((event_x - window_position.left) / game_window.clientWidth) - .5) * asp_x
-    mouse.y = -(((event_y - window_position.top) / game_window.clientHeight ) - .5) / asp_y
+    mouse.x = (((event_x - window_position.left) / _game_window.clientWidth) - .5) * asp_x
+    mouse.y = -(((event_y - window_position.top) / _game_window.clientHeight ) - .5) / asp_y
     mouse.position = [mouse.x, mouse.y]
 }
 
-function onmousemove(event) {
+function _onmousemove(event) {
     // print('move')
-    update_mouse_position(event)
+    _update_mouse_position(event)
 
     if (!mouse.hovered_entity) {
         mouse.point = null
@@ -1078,7 +1079,7 @@ function onmousemove(event) {
     }
 }
 
-document.addEventListener('pointermove', onmousemove)
+document.addEventListener('pointermove', _onmousemove)
 
 // palette = [
 //     '#000000', '#1D2B53', '#7E2553', '#008751', '#AB5236', '#5F574F', '#C2C3C7', '#FFF1E8',
@@ -1100,7 +1101,7 @@ document.addEventListener('pointermove', onmousemove)
 //     `
 // }
 // filters = document.createElement('div')
-// game_window.appendChild(filters)
+// _game_window.appendChild(filters)
 // filters.innerHTML = filter_code
 // class TintableTile extends Entity {
 //     get tint() {return this._tint}
@@ -1193,23 +1194,22 @@ function destroy(_entity) {
         _entity._parent._children.remove(_entity)
     }
     _entity.el.remove()
-    delete _entity
+    //delete _entity
 }
 
 function save_system_save(name, value) {localStorage.setItem(name, JSON.stringify(value))}
 function save_system_load(name) {try {return JSON.parse(localStorage.getItem(name))} catch (err) {print(err); return false}}
 function save_system_clear() {localStorage.clear()}
 
-savesystem = {save:save_system_save, load:save_system_load, clear:save_system_clear}
 time = 0
 delta_time = 1/60
-let start, previousTimeStamp;
+let start, _prev_time;
 update = null
-function _step(timestamp) {
+function _step(_timestamp) {
     if (start === undefined) {
-        start = timestamp;
+        start = _timestamp;
     }
-    const elapsed = timestamp - start;
+    const elapsed = _timestamp - start;
     if (update) {
         update()
     }
@@ -1220,9 +1220,9 @@ function _step(timestamp) {
         }
     }
 
-    time = timestamp / 1000
-    delta_time = (timestamp - previousTimeStamp) / 1000
-    previousTimeStamp = timestamp
+    time = _timestamp / 1000
+    delta_time = (_timestamp - _prev_time) / 1000
+    _prev_time = _timestamp
     window.requestAnimationFrame(_step);
 }
 window.requestAnimationFrame(_step)
@@ -1292,25 +1292,25 @@ document.addEventListener('wheel', _input); // modern desktop
 
 
 // triple click in the lower right to enter fullscreen
-hidden_fullscreen_button = new Button({parent:camera.ui, xy:bottom_right, roundness:.5, color:color.red, last_pressed_timestamp:-1, sequential_taps:0, visible_self:false})
-hidden_fullscreen_button.on_click = function() {
-    // print(time - hidden_fullscreen_button.last_pressed_timestamp)
-    if (time - hidden_fullscreen_button.last_pressed_timestamp < .25) {
-        hidden_fullscreen_button.sequential_taps += 1
-        if (hidden_fullscreen_button.sequential_taps >= 3) {
+_hidden_fullscreen_button = new Button({parent:camera.ui, xy:bottom_right, roundness:.5, color:color.red, last_pressed_timestamp:-1, sequential_taps:0, visible_self:false})
+_hidden_fullscreen_button.on_click = function() {
+    // print(time - _hidden_fullscreen_button.last_pressed_timestamp)
+    if (time - _hidden_fullscreen_button.last_pressed_timestamp < .25) {
+        _hidden_fullscreen_button.sequential_taps += 1
+        if (_hidden_fullscreen_button.sequential_taps >= 3) {
             set_fullscreen(!fullscreen)
-            hidden_fullscreen_button.sequential_taps = 0
+            _hidden_fullscreen_button.sequential_taps = 0
         }
     }
     else {  //reset
-        hidden_fullscreen_button.sequential_taps = 1
+        _hidden_fullscreen_button.sequential_taps = 1
     }
-    hidden_fullscreen_button.last_pressed_timestamp = time
+    _hidden_fullscreen_button.last_pressed_timestamp = time
 }
 
-function fullscreenchange() {
+function _fullscreenchange() {
     set_scale(1)
 }
-document.addEventListener('fullscreenchange', fullscreenchange)
+document.addEventListener('fullscreenchange', _fullscreenchange)
 
 set_orientation('vertical')
