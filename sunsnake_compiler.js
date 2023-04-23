@@ -357,8 +357,10 @@ abs = Math.abs
 floor = Math.floor
 ceil = Math.ceil
 math = Math
-round = Math.round
 sqrt = Math.sqrt
+function round(value, digits=0) {
+    return Number(Math.round(value+'e'+digits)+'e-'+digits);
+}
 
 function enumerate(list) {
     if (typeof list === 'array') {
