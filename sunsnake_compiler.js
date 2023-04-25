@@ -18,6 +18,8 @@ function compile(script) {
     strings = []
     string_index = 0
     const regexp = '\'(.*?)\'';
+    const regexp_backtick = '\`(.*?)\`';
+
     extra_replacements = []
     is_in_merge_lines_mode = false;
 
@@ -35,9 +37,9 @@ function compile(script) {
         if (all_lines[i].includes(': #')) {
             all_lines[i] = all_lines[i].split(': #')[0] + ':'
         }
-        // if (all_lines[i].trimStart().startsWith('define(')) {}
         // remove text so it doesn't get parsed as code.
         quotes = [...all_lines[i].matchAll(regexp)];
+        quotes.push(...all_lines[i].matchAll(regexp_backtick))
 
         for (var j=0; j<quotes.length; j++) {
             if (quotes[j][1].length > 0) {
