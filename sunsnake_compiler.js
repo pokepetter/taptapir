@@ -384,10 +384,11 @@ function int(value) {
     return parseInt(value)
 }
 
-function Array_2d(w, h) {
+function Array_2d(w, h, default_value=0) {
     var tiles = new Array(w)
     for (var i = 0; i < tiles.length; i++) {
         tiles[i] = new Array(h);
+        tiles[i].fill(default_value)
     }
     return tiles
 }
