@@ -881,20 +881,30 @@ class RainbowSlider extends Entity {
         this.text_entity = new Entity({parent:this, text:'000', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2, enabled:settings['show_text']})
         this.gradient = settings['gradient']
         this.value = settings['default']
+        this.active = false
         // this.color = settings['color']
 
         if (settings['show_lines']) {
             this.texture= 'tile.png'
             this.tileset_size = [1/settings['max'],1]
         }
-
-        this.on_click = function () {
+        this.on_click = function() {
             this.value = int((mouse.point[0]+.5+(1/this.max)) * this.max)
+            this.active = true
         }
-        this.update = function () {
-            if (mouse.left && mouse.hovered_entity == this) {
-                this.on_click()
-            }
+    }
+
+    update() {
+        if (this.active && mouse.left && mouse.hovered_entity == this) {
+            int((mouse.point[0]+.5+(1/this.max)) * this.max)
+        }
+    }
+
+    static input(key) {
+        print('oiewoifjweoifjwoeifj')
+        super.input(key)
+        if (key === 'left mouse up') {
+            this.active = false;
         }
     }
 
