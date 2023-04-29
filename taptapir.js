@@ -1255,10 +1255,12 @@ function _input(event) {
         else if (event.type == 'pointerdown') {
             if (event.button == 0) {key = 'left mouse down'; mouse.left=true; held_keys['mouse left']=true}
             else if (event.button == 1) {key = 'middle mouse down'; mouse.middle=true; held_keys['mouse middle']=true}
+            else if (event.button == 2) {key = 'right mouse down'; mouse.right=true; held_keys['mouse right']=true}
         }
         else if (event.type == 'pointerup') {
             if (event.button == 0) {key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false}
             else if (event.button == 1) {key = 'middle mouse up'; mouse.middle=false; held_keys['mouse middle']=false}
+            else if (event.button == 2) {key = 'right mouse up'; mouse.right=false; held_keys['mouse right']=false}
         }
 
         else {
