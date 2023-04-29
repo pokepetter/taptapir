@@ -895,16 +895,14 @@ class RainbowSlider extends Entity {
     }
 
     update() {
-        if (this.active && mouse.left && mouse.hovered_entity == this) {
-            int((mouse.point[0]+.5+(1/this.max)) * this.max)
+        if (this.active && mouse.left && mouse.hovered_entity === this) {
+            this.value = int((mouse.point[0]+.5+(1/this.max)) * this.max)
         }
     }
 
-    static input(key) {
-        print('oiewoifjweoifjwoeifj')
-        super.input(key)
+    input(key) {
         if (key === 'left mouse up') {
-            this.active = false;
+          this.active = false
         }
     }
 
