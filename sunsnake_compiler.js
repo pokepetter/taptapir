@@ -1,15 +1,22 @@
 print = console.log
 _class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField']
+_language = 'sunsnake'
+
+Array.prototype.at = function(i) {
+    if (i < 0) {
+        i = this.length + i
+    }
+    return this[i]
+}
 
 function compile(script) {
-    t = performance.now()
+    try {t = performance.now()} catch {}
     // start parsing
     script = script.replaceAll(',\n', ',')
     script = script.replaceAll('(\n', '(')
     script = script.replaceAll('{\n', '{')
     script = script.replaceAll('[\n', '[')
     script = script.replaceAll(' == ', ' === ')
-
     script = script.replaceAll('.index(', '.indexOf(')
 
     var all_lines = script.split('\n');
@@ -29,14 +36,24 @@ function compile(script) {
             // print('skip line')
             continue
         }
-        if (all_lines[i].trimStart().startsWith('//')) {
+        line = all_lines[i].trimStart()
+        if (line.startsWith('//')) {
             continue
         }
-        if (all_lines[i].trimStart().startsWith('#')) {
+        if (line.startsWith('#')) {
             continue
         }
         if (all_lines[i].includes(': #')) {
             all_lines[i] = all_lines[i].split(': #')[0] + ':'
+        }
+        if (line == `'language=python'`) {
+            _language = 'python'
+        }
+        else if (line == `'language=sunsnake'`) {
+            _language = 'sunsnake'
+        }
+        if (_language == 'python') {
+            continue
         }
         // remove text so it doesn't get parsed as code.
         quotes = [...all_lines[i].matchAll(regexp)];
@@ -52,18 +69,12 @@ function compile(script) {
         }
 
         // after keyword for easier invoke()
-        if (all_lines[i].trimStart().startsWith('after ') && all_lines[i].trimEnd().endsWith(':')) {
+        if (line.startsWith('after ') && all_lines[i].trimEnd().endsWith(':')) {
             start_indent = get_indent(all_lines[i])
             all_lines[i] = all_lines[i].replaceAll('after ', 'after(')
             all_lines[i] = all_lines[i].slice(0,-1) + ', function()'
             for (var j=i+1; j<all_lines.length; j++) {
                 if (get_indent(all_lines[j]) <= start_indent) {
-                    // if (lines[j-1].endsWith('}')) {
-                    // all_lines[j] = all_lines[j] + '})'
-                    // }
-                    // else {
-                    // lines[j] = lines[j] + ')'
-                    // }
                     break
                 }
             }
@@ -104,7 +115,7 @@ function compile(script) {
         lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
 
         // list comprehention
-        if (lines[i].includes('[') && lines[i].includes(']') && lines[i].includes(' for ') && lines[i].includes(' in ') && !lines[i].endsWith(':')) {
+        if (lines[i].includes('[') && lines[i].includes(']') && lines[i].includes(' for ') && lines[i].includes(' in ') && !lines[i].endsWith(':') && !lines[i].includes('[[')) {
             // remove part before list comprehension
             if (lines[i].includes(' = [')) {
                 code_before_list_comprehension = lines[i].split(' = [')[0] + ' = '
@@ -228,11 +239,9 @@ function compile(script) {
             lines[i] = lines[i].replaceAll(`${n}s`, `${n}`)
             lines[i] = lines[i].replaceAll(`${n}m`, `${n}*60`)
             lines[i] = lines[i].replaceAll(`${n}h`, `${n}*60*60`)
-
             lines[i] = lines[i].replaceAll(` in ${n}:`, ` in range(${n}):`)
         }
     }
-
     // add brackets based on indentation
     current_indent = 0
     after_statement_indents = []
@@ -246,7 +255,6 @@ function compile(script) {
                 lines[i-1] += ' {'
                 current_indent = current_line_indent
             }
-
             if (current_line_indent < prev_line_indent) {
                 for (var j of range(current_indent - current_line_indent)) {
                     lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
@@ -258,7 +266,6 @@ function compile(script) {
                 }
                 current_indent = current_line_indent
             }
-
             if (lines[i].trimStart().startsWith('after(')) {
                 after_statement_indents.push(current_indent)
             }
@@ -270,7 +277,6 @@ function compile(script) {
         new_line += '' + '    '.repeat(current_indent-1) + '}'
     }
     lines.push(new_line)
-
     var compiled_code = lines.join('\n')
 
     // add text back in
@@ -279,7 +285,7 @@ function compile(script) {
     }
 
     print('COMPILED CODE:', compiled_code)
-    print('compiled in', performance.now() - t, 'ms')
+    try {print('compiled in', performance.now() - t, 'ms')} catch {}
     return compiled_code
 }
 
@@ -288,26 +294,22 @@ function get_indent(str) {
         return 0
     }
     return (str.length - str.trimStart().length) / 4
-
 }
 
 function get_inside_brackets(str, open_bracket, closing_bracket) {
     text_inside_bracket = ''
     counter = 1
-
     for (const char of str) {
         if (char == open_bracket)
             counter += 1
 
         if (char == closing_bracket)
             counter -= 1
-
             if (counter == 0)
                 return text_inside_bracket
 
         text_inside_bracket += char
     }
-
 }
 function convert_arguments(line, class_name) {
     part_after = line.split(class_name+'(')[1]
@@ -352,10 +354,10 @@ function sum(arr) {
 }
 
 String.prototype.count=function(c) {
-  var result = 0, i = 0;
-  for(i;i<this.length;i++)if(this[i]==c)result++;
-  return result;
-};
+    var result = 0, i = 0;
+    for(i;i<this.length;i++)if(this[i]==c)result++;
+    return result;
+}
 print = console.log
 False = false
 True = true
@@ -378,7 +380,6 @@ function enumerate(list) {
     if (typeof list === 'object') {
         return Object.entries(list)
     }
-
 }
 
 function str(value) {
@@ -450,14 +451,20 @@ Array.prototype.remove = function (element) {
 function dict(values={}) {
     return values
 }
+__name__ = null // for python compability
 
-var scripts = document.getElementsByTagName("script")
-for (var script of scripts) {
-    if (script.type == 'text/sunsnake') {
-        print('compile:', script)
-        if (script.textContent) {
-            compiled_code = compile(script.textContent)
-            eval(compiled_code)
+try {
+    var scripts = document.getElementsByTagName("script")
+    for (var script of scripts) {
+        if (script.type == 'text/sunsnake') {
+            print('compile:', script)
+            if (script.textContent) {
+                compiled_code = compile(script.textContent)
+                eval(compiled_code)
+            }
         }
     }
+}
+catch (error) {
+    print(error)
 }
