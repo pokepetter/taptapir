@@ -45,7 +45,7 @@ body {
   transform: translate(-50%, -5%);
   text-align: center;
 }
-input {
+input, textarea {
   pointer-events: auto;
   height: 100%;
   width: 100%;
@@ -55,6 +55,8 @@ input {
   background-color: inherit;
   border-width: inherit;
   text-indent: .5em;
+  resize: none;
+  color: inherit;
 }
 `
 document.head.append(style)
