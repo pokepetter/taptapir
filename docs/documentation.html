@@ -66,7 +66,7 @@ Entity
 .look_at()
 
 .color
-.alpha
+.alpha <gray># Transparency</gray>
 .texture = <green>'some_image.png'</green>
 .roundness   <gray># 0</gray>
 .padding
@@ -76,11 +76,11 @@ Entity
 .text_color
 .text_size
 .text_origin
-.fit_to_text()
+.fit_to_text() <gray># Creates background and fits text to it</gray>
 
-.on_click
-.on_enable
-.on_disable
+.on_click <gray># To check if button clicked</gray>
+.on_enable <gray># To check if it's been enabled</gray>
+.on_disable <gray># To check if it's been disabled</gray>
 
 .ignore_collision
 .draggable    <gray># False / True</gray>
@@ -91,14 +91,15 @@ Entity
 
 .tileset_size
 .tile_coordinate
-
+<!--Cannot be invoked/inherited.-->
 </div>
+
 Classes
 <div class="code_block">
 Button
 Text
 InputField
-    value    
+value    
 HealthBar
 
 Scene
@@ -111,6 +112,14 @@ random_int()
 random_choice()
 random_color()
 lists_are_equal()
+</div>
+Controller support
+<div class="code_block">script src="taptapir/taptapir.js"
+script src="taptapir/taptapir_gamepad.js"
+
+<purple>def</purple> <yellow>input</yellow>(<blue>key</blue>):
+    <purple>if</purple> <blue>key</blue> == <green>'gamepad a'</green>:
+        <blue>print</blue>(<green>'button a pressed!'</green>)
 </div>
 </div>
 <br>
