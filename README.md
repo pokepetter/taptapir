@@ -18,7 +18,6 @@ Sunsnake is a Python inspired language for the web.
 * Indentation significant, no more {}-brackets :)
 * Significantly faster than Python.
 * Supports macros.
-* Supports controller input.
 
 If you don't want to use Sunsnake, you can still use Taptapir with JavaScript.
 
