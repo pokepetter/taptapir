@@ -328,8 +328,8 @@ function convert_arguments(line, class_name) {
 
     keys = new_arguments.split(',').map(e => e.split('=')[0])
     if (!keys.includes('name')) {
-        if (line.includes(`= ${class_name}`)) {
-            variable_name = line.split(`= ${class_name}`)[0].trimStart()
+        if (line.includes(`= new ${class_name}`)) {
+            variable_name = line.split(`= new ${class_name}`)[0].trimStart()
             if (variable_name.startsWith('let ')) {
                 variable_name = variable_name.slice(4)
             }
@@ -452,19 +452,15 @@ function dict(values={}) {
     return values
 }
 __name__ = null // for python compability
+__autocompile__ = true
 
-try {
-    var scripts = document.getElementsByTagName("script")
-    for (var script of scripts) {
-        if (script.type == 'text/sunsnake') {
-            print('compile:', script)
-            if (script.textContent) {
-                compiled_code = compile(script.textContent)
-                eval(compiled_code)
-            }
+var scripts = document.getElementsByTagName("script")
+for (var script of scripts) {
+    if (script.type == 'text/sunsnake') {
+        print('compile:', script)
+        if (script.textContent) {
+            compiled_code = compile(script.textContent)
+            eval(compiled_code)
         }
     }
-}
-catch (error) {
-    print(error)
 }

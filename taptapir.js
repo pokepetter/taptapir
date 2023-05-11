@@ -923,7 +923,7 @@ class RainbowSlider extends Entity {
 
 class InputField extends Entity {
     constructor(options=false) {
-        let settings = {roundness:.5, color:color.smoke, text_size:2, text_color:color.azure, value:''}
+        let settings = {roundness:.5, color:color.smoke, text_size:2, value:''}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
