@@ -2,6 +2,12 @@
 scale = 1
 print = console.log
 
+Array.prototype.remove = function (element) {
+    var index = this.indexOf(element)
+    if (index >= 0) {
+        this.splice(index, 1)
+    }
+}
 
 var _loading_text = document.getElementById('loading_text')
 if (_loading_text) {
@@ -73,6 +79,7 @@ if (!_game_window) {
 const scene = document.createElement('entity')
 scene.className = 'entity'
 scene.id = 'scene'
+scene._children = []
 _game_window.appendChild(scene)
 
 // print('browser aspect_ratio:', browser_aspect_ratio)
@@ -285,6 +292,12 @@ class Entity {
         if (!('render' in options) || options['render']) {
             scene.appendChild(this.el)
         }
+
+        // if (!'parent' in options) {
+            // print('default to scene')
+        this.parent = scene
+        // }
+
         this.children = []
         this._enabled = true
         this.on_enable = null
@@ -331,11 +344,11 @@ class Entity {
             value.el.appendChild(this.el)
         }
         if (this._parent && this._parent._children) {
-            this._parent.children.remove(self)
+            this._parent._children.remove(self)
         }
         this._parent = value
-        if (value._children && !value.children.includes(this)) {
-            value.children.push(this)
+        if (value._children && !value._children.includes(this)) {
+            value._children.push(this)
         }
     }
     get children() {return this._children}
@@ -799,7 +812,7 @@ function Scene(name='', options=false) {
 }
 class StateHandler {
     constructor (states, fade) {
-        this.overlay = new Entity({parent:camera, name:'overlay', color:color.clear, alpha:0, z:-1, scale:[1,aspect_ratio]})
+        camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-1, scale:[1.1,aspect_ratio*1.1]})
         this.states = states
         this.fade = fade
         this.state = Object.keys(states)[0]
@@ -808,9 +821,9 @@ class StateHandler {
     get state() {return this._state}
     set state(value) {
         if (this.fade && (value != this._state)) {
-            this.overlay.animate('alpha', 1, .1)
+            camera.overlay.animate('alpha', 1, .1)
             setTimeout(() => {
-                this.overlay.animate('alpha', 0, 1)
+                camera.overlay.animate('alpha', 0, 1)
                 this.hard_state = value
             }, 100)
         }
@@ -1200,6 +1213,9 @@ function sample(population, k){
 }
 
 function destroy(_entity) {
+    if (!_entity) {
+        return
+    }
     if (_entity._parent && _entity._parent._children) {
         _entity._parent._children.remove(_entity)
     }
