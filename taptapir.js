@@ -961,7 +961,7 @@ class InputField extends Entity {
 }
 
 
-mouse = {x:0, y:0, position:[0,0], left:false, middle:false, hovered_entity:null,
+mouse = {x:0, y:0, position:[0,0], left:false, middle:false, pressure:0.0, hovered_entity:null,
     set texture(name) {     // TODO: fix this
         document.body.style.cursor = `url('${name}', auto)`
         // print('spegijseofijseofijseiofddddddddddddddddddddddddddddddd', document.body.style)
@@ -973,9 +973,10 @@ function _mousedown(event) {
     if (event.button > 0) {
         return
     }
-    if (event.pointerType == 'mouse' || event.pointerType == 'touch') {
-        mouse.pressure = 1
-    }
+
+    // if (event.pointerType == 'mouse' || event.pointerType == 'touch') {
+    //     mouse.pressure = 1
+    // }
     // else {
     //     mouse.pressure = event.originalEvent.pressure
     // }
@@ -1053,6 +1054,7 @@ function _update_mouse_position(event) {
     mouse.x = (((event_x - window_position.left) / _game_window.clientWidth) - .5) * asp_x
     mouse.y = -(((event_y - window_position.top) / _game_window.clientHeight ) - .5) / asp_y
     mouse.position = [mouse.x, mouse.y]
+    mouse.pressure = event.pressure * 2
 }
 
 function _onmousemove(event) {
