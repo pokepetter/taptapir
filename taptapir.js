@@ -76,7 +76,7 @@ if (!_game_window) {
     }
     document.body.appendChild(_game_window)
 }
-const scene = document.createElement('entity')
+scene = document.createElement('entity')
 scene.className = 'entity'
 scene.id = 'scene'
 scene._children = []
@@ -151,6 +151,7 @@ set_orientation('vertical')
 
 
 function rgb(r, g, b) {return `rgb(${parseInt(r*255)},${parseInt(g*255)},${parseInt(b*255)})`}
+function rgb32(r, g, b) {return `rgb(${r},${g},${b})`}
 
 function hex_to_rgb(value) {
     if (value.length === 4) {

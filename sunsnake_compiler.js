@@ -9,6 +9,10 @@ Array.prototype.at = function(i) {
     return this[i]
 }
 
+try {''.replaceAll('', '')} // make sure replaceAll is supported, else implement it.
+catch {String.prototype.replaceAll = function replaceAll(search, replace) { return this.split(search).join(replace); }}
+
+
 function compile(script) {
     try {t = performance.now()} catch {}
     // start parsing
@@ -29,7 +33,7 @@ function compile(script) {
     const regexp_backtick = '\`(.*?)\`';
 
     extra_replacements = []
-    is_in_merge_lines_mode = false;
+    is_in_multipline_string = false;
 
     for (var i=0; i<all_lines.length; i++) {
         if (!all_lines[i].trim()) {
@@ -55,6 +59,19 @@ function compile(script) {
         if (_language == 'python') {
             continue
         }
+        // if (is_in_multipline_string && !line.trimEnd().endsWith("'''")) {
+        //   lines.push(`"${all_lines[i]}" +`)
+        //   continue
+        // }
+        // if (line.trimEnd().endsWith("'''")) {
+        //     is_in_multipline_string = !is_in_multipline_string
+        //     if (is_in_multipline_string) {
+        //         all_lines[i] = line.slice(0,-3) + '"" +'
+        //     }
+        //     else {
+        //       all_lines[i] = line.slice(0,-3) + '""'
+        //     }
+        // }
         // remove text so it doesn't get parsed as code.
         quotes = [...all_lines[i].matchAll(regexp)];
         quotes.push(...all_lines[i].matchAll(regexp_backtick))
@@ -90,6 +107,9 @@ function compile(script) {
     }
 
     for (var i=0; i<lines.length; i++) {
+        if (lines[i].endsWith('\\')) {
+            continue
+        }
         if (lines[i].trimStart().startsWith('sunsnake.define(')) {
             content = lines[i].slice(16, -1)
             const [key, ...rest] = content.split(',')
