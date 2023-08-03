@@ -1227,7 +1227,14 @@ function destroy(_entity) {
 }
 
 function save_system_save(name, value) {localStorage.setItem(name, JSON.stringify(value))}
-function save_system_load(name) {try {return JSON.parse(localStorage.getItem(name))} catch (err) {print(err); return false}}
+function save_system_load(name) {
+    try {
+        return JSON.parse(localStorage.getItem(name))
+    }
+    catch (err) {
+        print(err)
+        return 0}
+    }
 function save_system_clear() {localStorage.clear()}
 
 time = 0
