@@ -1,5 +1,5 @@
 print = console.log
-_class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField']
+_class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField', 'StateHandler']
 _language = 'sunsnake'
 
 Array.prototype.at = function(i) {
@@ -193,7 +193,9 @@ function compile(script) {
         }
 
         // dict iteration
+        // print('ITERATE DICT', lines[i].trimStart().startsWith('for key, value in '), lines[i].includes('.items()'))
         else if (lines[i].trimStart().startsWith('for key, value in ') && lines[i].includes('.items()')) {
+            print('ITERATE DICT')
             var dict_name = lines[i].split('for key, value in ')[1].split('.items()')[0]
             lines[i] = lines[i].replace('for key, value in ', 'for (let [key, value] of ')
             lines[i] = lines[i].replace(`${dict_name}.items()`, `Object.entries(${dict_name}))`)
@@ -382,6 +384,7 @@ print = console.log
 False = false
 True = true
 None = null
+float = parseFloat
 min = Math.min
 max = Math.max
 abs = Math.abs
@@ -394,10 +397,10 @@ function round(value, digits=0) {
 }
 
 function enumerate(list) {
-    if (typeof list === 'array') {
+    if (typeof list.prop2 === 'function') {
         return list.entries()
     }
-    if (typeof list === 'object') {
+    else if (typeof list === 'object') {
         return Object.entries(list)
     }
 }
