@@ -625,6 +625,9 @@ class Entity {
     animate(variable_name, target_value, duration=.1) {
         // print('animate:', variable_name, target_value)
         if (!this.enabled) {return false}
+        if (duration <= 1/60) {
+            this[variable_name] = target_value
+        }
         let entity = this
         // stop ongoing animation of this varibale
         if (variable_name in entity.setTimeout_calls) {
@@ -649,6 +652,16 @@ class Entity {
                 )
             )
         }
+        entity.setTimeout_calls[variable_name].push(
+            setTimeout(
+                function anon() {
+                    if (!entity.enabled) {
+                        return false}
+                        entity[variable_name] = target_value
+                    },
+                    1000*duration
+                )
+            )
     }
 
     fit_to_text() {
@@ -812,11 +825,16 @@ function Scene(name='', options=false) {
     return _entity
 }
 class StateHandler {
-    constructor (states, fade) {
+    constructor (options) {
+        let settings = {states:{}, fade:false}
+        for (const [key, value] of Object.entries(options)) {
+            settings[key] = value
+        }
+
         camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-1, scale:[1.1,aspect_ratio*1.1]})
-        this.states = states
-        this.fade = fade
-        this.state = Object.keys(states)[0]
+        this.states = settings['states']
+        this.fade = settings['fade']
+        this.state = Object.keys(this.states)[0]
     }
 
     get state() {return this._state}
@@ -835,6 +853,7 @@ class StateHandler {
     set hard_state(value) {     // set the state without fading
         // print('set state to:', value)
         for (const [key, entity] of Object.entries(this.states)) {
+            print('----', key, value)
             if (key == value || value == entity) {
                 entity.enabled = true
                 if (entity.on_enter) {
@@ -1214,6 +1233,22 @@ function sample(population, k){
 
     return result;
 }
+
+// function grid_layout(options=false):
+//     let settings = dict(l=[], spacing=[1.1,1.1], offset=[0,0])
+//     for (const [key, value] of Object.entries(options)) {
+//         settings[key] = value
+//     }
+//     x = 0
+//     y = 0
+//     for i, e in l:
+//         e.xy = [(x * l[0].scale_x * spacing[0]) + offset[0],
+//                 (-y * l[1].scale_y * spacing[1]) + offset[1]]
+//
+//         x += 1
+//         if x >= max_x:
+//             y += 1
+//             x = 0
 
 function destroy(_entity) {
     if (!_entity) {
