@@ -421,6 +421,9 @@ class Entity {
         if (typeof value == "string" && value.startsWith('#')) {
             value = hex_to_rgb(value)
         }
+        else if (typeof value === 'number') {
+            value = hsv(0,0,value)
+        }
         if (value.length == 3) {
             value = [value[0], value[1], value[2], 255]
         }
@@ -852,6 +855,9 @@ class StateHandler {
     }
     set hard_state(value) {     // set the state without fading
         // print('set state to:', value)
+        if (this._state === value) {
+            return
+        }
         for (const [key, entity] of Object.entries(this.states)) {
             print('----', key, value)
             if (key == value || value == entity) {
@@ -907,13 +913,13 @@ class HealthBar extends Entity {
 }
 class RainbowSlider extends Entity {
     constructor(options=false) {
-        let settings = {min:1, max:5, default:1, color:'#222', scale:[.8,.05], roundness:.25, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
+        let settings = {min:1, max:5, default:1, color:'#222', text_color:'#ddd', scale:[.8,.05], roundness:.25, text_size:2, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
         super(settings)
         this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25})
-        this.text_entity = new Entity({parent:this, text:'000', text_color:'#ddd', color:color.clear, text_origin:[0,0], text_size:2, enabled:settings['show_text']})
+        this.text_entity = new Entity({parent:this, text:'000', text_color:settings['text_color'], color:color.clear, text_origin:[0,0], text_size:settings['text_size'], enabled:settings['show_text']})
         this.gradient = settings['gradient']
         this.value = settings['default']
         this.active = false
