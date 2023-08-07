@@ -150,8 +150,8 @@ function set_orientation(value) {
 set_orientation('vertical')
 
 
-function rgb(r, g, b) {return `rgb(${parseInt(r*255)},${parseInt(g*255)},${parseInt(b*255)})`}
-function rgb32(r, g, b) {return `rgb(${r},${g},${b})`}
+function rgb(r, g, b) {return [parseInt(r*255), parseInt(g*255), parseInt(b*255)]}
+function rgb32(r, g, b) {return [r,g,b]}
 
 function hex_to_rgb(value) {
     if (value.length === 4) {
