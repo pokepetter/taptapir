@@ -265,6 +265,7 @@ function compile(script) {
             lines[i] = lines[i].replaceAll(`${n}m`, `${n}*60`)
             lines[i] = lines[i].replaceAll(`${n}h`, `${n}*60*60`)
             lines[i] = lines[i].replaceAll(` in ${n}:`, ` in range(${n}):`)
+            lines[i] = lines[i].replaceAll(`${n}%`, `${n}*.01`)
         }
     }
     // add brackets based on indentation
