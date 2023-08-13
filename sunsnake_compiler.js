@@ -254,6 +254,9 @@ function compile(script) {
                 lines[i] = lines[i].replace(`${is_first_word}${class_name}(`, `${is_first_word}new ${class_name}(`)
                 lines[i] = convert_arguments(lines[i], class_name)
             }
+            if (lines[i].startsWith(` new `)) {
+                lines[i] = lines[i].trimStart()
+            }
         }
 
         for (var n=0; n<10; n++) {
