@@ -546,6 +546,10 @@ class Entity {
             this.model.style.boxShadow = value
         }
     }
+    get font() {return this.style.fontFamily}
+    set font(value) {
+        this.model.style.fontFamily = value
+    }
 
     get text() {return this.model.textContent}
     set text(value) {
