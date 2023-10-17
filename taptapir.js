@@ -1273,12 +1273,10 @@ function destroy(_entity) {
 
 function save_system_save(name, value) {localStorage.setItem(name, JSON.stringify(value))}
 function save_system_load(name) {
-    try {
-        return JSON.parse(localStorage.getItem(name))
+    if (!localStorage.hasOwnProperty(name)) {
+        return 0
     }
-    catch (err) {
-        print(err)
-        return 0}
+    return JSON.parse(localStorage.getItem(name))
     }
 function save_system_clear() {localStorage.clear()}
 
