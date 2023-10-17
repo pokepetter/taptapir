@@ -20,6 +20,8 @@ function compile(script) {
     script = script.replaceAll('(\n', '(')
     script = script.replaceAll('{\n', '{')
     script = script.replaceAll('[\n', '[')
+    script = script.replaceAll('=\n', '=')
+    script = script.replaceAll('+\n', '+')
     script = script.replaceAll(' == ', ' === ')
     script = script.replaceAll('.index(', '.indexOf(')
 
@@ -33,7 +35,7 @@ function compile(script) {
     const regexp_backtick = '\`(.*?)\`';
 
     extra_replacements = []
-    is_in_multipline_string = false;
+    is_in_multiline_string = false;
 
     for (var i=0; i<all_lines.length; i++) {
         if (!all_lines[i].trim()) {
@@ -59,13 +61,13 @@ function compile(script) {
         if (_language == 'python') {
             continue
         }
-        // if (is_in_multipline_string && !line.trimEnd().endsWith("'''")) {
+        // if (is_in_multiline_string && !line.trimEnd().endsWith("'''")) {
         //   lines.push(`"${all_lines[i]}" +`)
         //   continue
         // }
         // if (line.trimEnd().endsWith("'''")) {
-        //     is_in_multipline_string = !is_in_multipline_string
-        //     if (is_in_multipline_string) {
+        //     is_in_multiline_string = !is_in_multiline_string
+        //     if (is_in_multiline_string) {
         //         all_lines[i] = line.slice(0,-3) + '"" +'
         //     }
         //     else {
@@ -239,6 +241,20 @@ function compile(script) {
             lines[i] = lines[i].replace(`${word_before_in} in ${word_after_in}`, `${word_after_in}.includes(${word_before_in})`)
         }
 
+        // multiline string wrappend in triple backticks```
+        if (!is_in_multiline_string && lines[i].trimEnd().endsWith('```') && lines[i].trim() != '```') {    // start
+            is_in_multiline_string = true
+            lines[i] = lines[i].replace('```', '(')
+        }
+        else if (is_in_multiline_string && !lines[i].includes('```')) {
+            lines[i] = '    '.repeat(get_indent(lines[i])) + '`' + lines[i].trimStart() + '\n` +'
+        }
+        else if (is_in_multiline_string && lines[i].includes('```')) {   // end
+            is_in_multiline_string = false
+            lines[i] = lines[i].replace('```', '``)')
+        }
+
+
         for (var class_name of ['dict', ]) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
@@ -272,29 +288,30 @@ function compile(script) {
     current_indent = 0
     after_statement_indents = []
 
-    for (var i=0; i<lines.length; i++) {
-        if (i > 0) {
-            prev_line_indent = get_indent(lines[i-1])
-            current_line_indent = get_indent(lines[i])
+    for (var i=1; i<lines.length; i++) {
+        if (lines[i-1].endsWith('=') || lines[i-1].endsWith('+') || lines[i-1].endsWith('(')) {
+            continue
+        }
+        prev_line_indent = get_indent(lines[i-1])
+        current_line_indent = get_indent(lines[i])
 
-            if (current_line_indent > prev_line_indent) {
-                lines[i-1] += ' {'
-                current_indent = current_line_indent
-            }
-            if (current_line_indent < prev_line_indent) {
-                for (var j of range(current_indent - current_line_indent)) {
-                    lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
+        if (current_line_indent > prev_line_indent) {
+            lines[i-1] += ' {'
+            current_indent = current_line_indent
+        }
+        if (current_line_indent < prev_line_indent) {
+            for (var j of range(current_indent - current_line_indent)) {
+                lines[i-1] += '\n' + '    '.repeat(current_indent-j-1) + '}'
 
-                    if (after_statement_indents.at(-1) === current_indent-j-1) {
-                        lines[i-1] += ')'
-                        after_statement_indents.pop()
-                    }
+                if (after_statement_indents.at(-1) === current_indent-j-1) {
+                    lines[i-1] += ')'
+                    after_statement_indents.pop()
                 }
-                current_indent = current_line_indent
             }
-            if (lines[i].trimStart().startsWith('after(')) {
-                after_statement_indents.push(current_indent)
-            }
+            current_indent = current_line_indent
+        }
+        if (lines[i].trimStart().startsWith('after(')) {
+            after_statement_indents.push(current_indent)
         }
     }
 
@@ -304,6 +321,8 @@ function compile(script) {
     }
     lines.push(new_line)
     var compiled_code = lines.join('\n')
+    // compiled_code = compiled_code.replaceAll('+\n', '+')
+    // compiled_code = compiled_code.replaceAll('(\n', '(')
 
     // add text back in
     for (var i=0; i<strings.length; i++) {
