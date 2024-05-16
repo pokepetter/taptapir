@@ -917,7 +917,7 @@ class HealthBar extends Entity {
 }
 class RainbowSlider extends Entity {
     constructor(options=false) {
-        let settings = {min:1, max:5, default:1, color:'#222', text_color:'#ddd', scale:[.8,.05], roundness:.25, text_size:2, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
+        let settings = {min:1, max:5, c:1, color:'#222', text_color:'#ddd', scale:[.8,.05], roundness:.25, text_size:2, show_text:false, show_lines:false, gradient:['#CCCCFF', '#6495ED', '#40E0D0', '#9FE2BF', '#28ccaa'], }
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
@@ -1272,9 +1272,9 @@ function destroy(_entity) {
 }
 
 function save_system_save(name, value) {localStorage.setItem(name, JSON.stringify(value))}
-function save_system_load(name) {
+function save_system_load(name, fallback=0) {
     if (!localStorage.hasOwnProperty(name)) {
-        return 0
+        return fallback
     }
     return JSON.parse(localStorage.getItem(name))
     }
