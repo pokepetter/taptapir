@@ -133,6 +133,7 @@ function compile(script) {
         lines[i] = lines[i].replaceAll('.append(', '.push(')
         lines[i] = lines[i].replaceAll('.add(', '.push(')
         lines[i] = lines[i].replaceAll('.sum()', '.reduce((a, b) => a + b, 0)')
+        lines[i] = lines[i].replaceAll('.endswith(', '.endsWith(')
         lines[i] = lines[i].replaceAll('[-1]', '.at(-1)')
         lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
 
@@ -492,6 +493,19 @@ Array.prototype.remove = function (element) {
     if (index >= 0) {
         this.splice(index, 1)
     }
+}
+Array.prototype.remove_at = function (index) {
+    this.splice(index, 1)
+}
+
+Array.prototype.skip = function (n) {
+    return this.splice(n)
+}
+Array.prototype.take = function (n) {
+    return this.splice(0, n)
+}
+Array.prototype.take_last = function (n) {
+    return this.splice(-n)
 }
 
 function dict(values={}) {

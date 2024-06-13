@@ -254,6 +254,7 @@ function set_fullscreen(value) {
 }
 
 ASSETS_FOLDER = ''
+TAPTAPIR_TEXTURES = {}
 entities = []
 
 class Entity {
@@ -499,27 +500,37 @@ class Entity {
     }
 
     get texture() {return this._texture}
-    set texture(value) {
-        this._texture = value
-        if (!value) {
+    set texture(name) {
+        this._texture = name
+        if (!name) {
             this.model.style.backgroundImage = 'none'
             return
         }
-
-        if (!value.endsWith('.gif') && !value.startsWith('data:')) {    // static image
-            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}")`
+        if (name in TAPTAPIR_TEXTURES) {   // base64 strings stored in TAPTAPIR_TEXTURES dict. used when including textures directly in builds.
+            if (!TAPTAPIR_TEXTURES[name].startsWith('data:image/gif')) {   // static image
+                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}")`
+            }
+            else {
+                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+                print(this.model.style.backgroundImage)
+            }
             this.color = color.clear
             return
         }
 
-        if (value.endsWith('.gif')) {   // .gif (ensure animation replays on reuse)
-            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${value}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+        else if (!name.endsWith('.gif')) {    // static image
+            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}")`
             this.color = color.clear
             return
         }
 
-        if (value.startsWith('data:')) {
-            this.model.style.backgroundImage = `url("${value}")`
+        else if (name.endsWith('.gif')) {   // .gif (ensure animation replays on reuse)
+            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+            this.color = color.clear
+            return
+        }
+        else if (name.startsWith('data:')) {
+            this.model.style.backgroundImage = `url("${name}")`
             this.color = color.clear
             return
         }
