@@ -274,6 +274,14 @@ class Entity {
             return
         }
 
+        this.resettable = false
+        if ('resettable' in options) {
+            this.resettable = options['resettable']
+        }
+        if (this.resettable) {
+            this.original_settings = options
+        }
+
         this.el = document.createElement(options['type'])
         this.el.className = options['type']
 
@@ -685,6 +693,12 @@ class Entity {
             _entity.el.remove()
         }
         this.children = []
+    }
+
+    reset() {
+        for (const [key, value] of Object.entries(this.original_settings)) {
+            this[key] = value
+        }
     }
 }
 
@@ -1133,8 +1147,12 @@ function _onmousemove(event) {
         }
     }
 }
-
 document.addEventListener('pointermove', _onmousemove)
+
+mouse.update = () => {      // simulate pointermove. can for example be used to get an updated mouse.hovered_entity or mouse.point without having to wait a frame.
+    var myEvent = new PointerEvent('pointermove')
+    document.body.dispatchEvent(myEvent)
+}
 
 // palette = [
 //     '#000000', '#1D2B53', '#7E2553', '#008751', '#AB5236', '#5F574F', '#C2C3C7', '#FFF1E8',
@@ -1244,21 +1262,30 @@ function sample(population, k){
     return result;
 }
 
-// function grid_layout(options=false):
-//     let settings = dict(l=[], spacing=[1.1,1.1], offset=[0,0])
-//     for (const [key, value] of Object.entries(options)) {
-//         settings[key] = value
-//     }
-//     x = 0
-//     y = 0
-//     for i, e in l:
-//         e.xy = [(x * l[0].scale_x * spacing[0]) + offset[0],
-//                 (-y * l[1].scale_y * spacing[1]) + offset[1]]
-//
-//         x += 1
-//         if x >= max_x:
-//             y += 1
-//             x = 0
+function grid_layout(options=false) {
+    let settings = {l:[], spacing:[1.1,1.1], offset:[0,0], max_x:16}
+    for (const [key, value] of Object.entries(options)) {
+        settings[key] = value
+    }
+    l = settings['l']
+    spacing = settings['spacing']
+    offset = settings['offset']
+    max_x = settings['max_x']
+    x = 0
+    y = 0
+
+    for (let i = 0; i < l.length; i++) {
+        const e = l[i]
+        e.xy = [(x * l[0].scale_x * spacing[0]) + offset[0],
+                (-y * l[1].scale_y * spacing[1]) + offset[1]]
+
+        x += 1
+        if (x >= max_x) {
+            y += 1
+            x = 0
+        }
+    }
+}
 
 function destroy(_entity) {
     if (!_entity) {
