@@ -652,6 +652,17 @@ class Entity {
         }
     }
 
+    get popup() {return this._popup}
+    set popup(value) {
+        this._popup = value
+        if (value) {
+            this._popup_bg = new Entity({parent:this, scale:99, color:color.black, alpha:.5, z:1, on_click:()=>{this.enabled=false}})
+        }
+        else if (this._popup_bg) {
+            destroy(this._popup_bg)
+        }
+    }
+
     animate(variable_name, target_value, duration=.1) {
         // print('animate:', variable_name, target_value)
         if (!this.enabled) {return false}
@@ -1275,14 +1286,14 @@ function sample(population, k){
     }
 
     return result;
-}
-
-function grid_layout(options=false) {
-    let settings = {l:[], spacing:[1.1,1.1], offset:[0,0], max_x:16}
+    }
+    
+    function grid_layout(l, options) {
+    let settings = {spacing:[1.1,1.1], offset:[0,0], max_x:16}
     for (const [key, value] of Object.entries(options)) {
+        print('setting', key, 'to', value)
         settings[key] = value
     }
-    l = settings['l']
     spacing = settings['spacing']
     offset = settings['offset']
     max_x = settings['max_x']
