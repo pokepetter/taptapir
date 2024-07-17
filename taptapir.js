@@ -516,13 +516,24 @@ class Entity {
             }
             else {
                 this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
-                print(this.model.style.backgroundImage)
             }
             this.color = color.clear
             return
         }
 
         else if (!name.endsWith('.gif')) {    // static image
+            if (!name.includes('.')) {
+                var jpg_image = new Image();
+                jpg_image.onload = () => {
+                    print(`${name}.jpg exists`)
+                    this.texture = `${name}.jpg`
+                    return
+                }
+                jpg_image.onerror = () => {
+                    this.texture = `${name}.png`
+                }
+                jpg_image.src = `${name}.jpg`
+            }
             this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}")`
             this.color = color.clear
             return
@@ -613,7 +624,8 @@ class Entity {
     get padding() {return this._padding}
     set padding(value) {
         this._padding = value
-        this.model.style.padding = `${value}em`
+        if (typeof value == "number") {value = [value, value]}
+        this.model.style.padding = `${value[1]}em ${value[0]}em ${value[1]}em ${value[0]}em`
     }
 
     get on_click() {return this._on_click}
@@ -726,6 +738,13 @@ class Entity {
             this[key] = value
         }
     }
+}
+
+async function check_image(url){
+    const res = await fetch(url);
+    const buff = await res.blob();
+   
+    return buff.type.startsWith('image/')
 }
 
 function lerp(a, b, t) {
@@ -866,8 +885,8 @@ function Scene(name='', options=false) {
     }
     settings['name'] = name
     _entity = new Entity(settings)
-    _entity.bg = new Entity({parent:_entity, scale_y:aspect_ratio})
-    _entity.bg.texture = name + '.jpg'
+    _entity.bg = new Entity({parent:_entity, scale_x:asp_x, scale_y:1/asp_y})
+    _entity.bg.texture = name   
     state_handler.states[name] = _entity
     return _entity
 }
