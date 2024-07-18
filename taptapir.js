@@ -601,6 +601,13 @@ class Entity {
         }
         this.model.style.color = value
     }
+    get text_alpha() {return this.text_color[3]}
+    set text_alpha(value) {
+        print(value)
+        var current_color = this.color
+        current_color[3] = value
+        this.text_color = current_color
+    }
     get text_size() {return this._text_size}
     set text_size(value) {
         this._text_size = value
@@ -878,15 +885,15 @@ function Canvas(options) {
     return e
 }
 
-function Scene(name='', options=false) {
+function Scene(options) {
     settings = {visible_self:false, on_enter:null}
     for (const [key, value] of Object.entries(options)) {
         settings[key] = value
     }
-    settings['name'] = name
+    name = settings['name']
     _entity = new Entity(settings)
-    _entity.bg = new Entity({parent:_entity, scale_x:asp_x, scale_y:1/asp_y})
-    _entity.bg.texture = name   
+    print('------------texture:', options)
+    _entity.bg = new Entity({parent:_entity, scale_x:asp_x, scale_y:1/asp_y, texture:settings['texture']})
     state_handler.states[name] = _entity
     return _entity
 }
@@ -897,7 +904,7 @@ class StateHandler {
             settings[key] = value
         }
 
-        camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-1, scale:[1.1,aspect_ratio*1.1]})
+        camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-99, scale:[1.1,aspect_ratio*1.1]})
         this.states = settings['states']
         this.fade = settings['fade']
         this.state = Object.keys(this.states)[0]
@@ -905,12 +912,14 @@ class StateHandler {
 
     get state() {return this._state}
     set state(value) {
+        print('goto state:', value, this.fade)
         if (this.fade && (value != this._state)) {
-            camera.overlay.animate('alpha', 1, .1)
+            print('fade in overlay')
+            camera.overlay.animate('alpha', 1, .2)
             setTimeout(() => {
                 camera.overlay.animate('alpha', 0, 1)
                 this.hard_state = value
-            }, 100)
+            }, 200)
         }
         else {
             this.hard_state = value
@@ -922,7 +931,7 @@ class StateHandler {
             return
         }
         for (const [key, entity] of Object.entries(this.states)) {
-            print('----', key, value)
+            // print('----', key, value)
             if (key == value || value == entity) {
                 entity.enabled = true
                 if (entity.on_enter) {
@@ -937,7 +946,7 @@ class StateHandler {
     }
 }
 
-state_handler = new StateHandler({}, true)
+state_handler = new StateHandler({fade:true})
 
 function goto_scene(scene_name, fade=True) {
     if (!fade) {
