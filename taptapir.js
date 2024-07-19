@@ -785,73 +785,73 @@ function lists_are_equal(array_a, array_b) {
 
 
 class Camera{
-  constructor(options=null) {
-      this.el = document.createElement('entity')
-      _game_window.appendChild(this.el)
-      this.el.className = 'entity'
-      // this.el.style.height = scene.style.height
-      // this.el.style.width = scene.style.width
-      this.el.id = 'camera'
-      this.children = []
-      this._x = 0
-      this._y = 0
-      this.fov = 1
-  }
+    constructor(options=null) {
+        this.el = document.createElement('entity')
+        _game_window.appendChild(this.el)
+        this.el.className = 'entity'
+        // this.el.style.height = scene.style.height
+        // this.el.style.width = scene.style.width
+        this.el.id = 'camera'
+        this.children = []
+        this._x = 0
+        this._y = 0
+        this.fov = 1
+    }
 
-  get x() {return this._x}
-  set x(value) {
-      this._x = value
-      if (format == 'vertical') {
-          scene.style.left = `${50+(-value*100/this.fov)}%`
-      }
-      else {
-          scene.style.left = `${50+(-value*100/asp_x/this.fov)}%`
-      }
-  }
-  get y() {return this._y}
-  set y(value) {
-      this._y = value
-      if (format == 'vertical') {
-          scene.style.top = `${50+(value*100*asp_y/this.fov)}%`
-      }
-      else {
-          scene.style.top = `${50+(value*100/this.fov)}%`
-      }
-  }
-  get xy() {return [this._x, this._y]}
-  set xy(value) {
-      this.x = value[0]
-      this.y = value[1]
-  }
-  get xyz() {return [this._x, this._y, this._z]}
-  set xyz(value) {
-      this.x = value[0]
-      this.y = value[1]
-      // this.z = value[2]
-  }
-  get position() {return this.xyz}
-  set position(value) {
-      if (value.length == 2) {this.xy = value}
-      if (value.length == 3) {this.xy = [value[0], value[1]]}
-  }
-  get rotation() {return this._rotation}
-  set rotation(value) {
-      this._rotation = value
-      scene.style.transform = `rotate(${-value}deg)`
-  }
-  get fov() {return self._fov}
-  set fov(value) {
-      self._fov = value
-      scene.style.width = `${1/value*100/asp_x}%`
+    get x() {return this._x}
+    set x(value) {
+        this._x = value
+        if (format == 'vertical') {
+            scene.style.left = `${50+(-value*100/this.fov)}%`
+        }
+        else {
+        scene.style.left = `${50+(-value*100/asp_x/this.fov)}%`
+        }
+    }
+    get y() {return this._y}
+    set y(value) {
+        this._y = value
+        if (format == 'vertical') {
+            scene.style.top = `${50+(value*100*asp_y/this.fov)}%`
+        }
+        else {
+            scene.style.top = `${50+(value*100/this.fov)}%`
+        }
+    }
+    get xy() {return [this._x, this._y]}
+    set xy(value) {
+        this.x = value[0]
+        this.y = value[1]
+    }
+    get xyz() {return [this._x, this._y, this._z]}
+    set xyz(value) {
+        this.x = value[0]
+        this.y = value[1]
+        // this.z = value[2]
+    }
+    get position() {return this.xyz}
+    set position(value) {
+        if (value.length == 2) {this.xy = value}
+        if (value.length == 3) {this.xy = [value[0], value[1]]}
+    }
+    get rotation() {return this._rotation}
+    set rotation(value) {
+        this._rotation = value
+        scene.style.transform = `rotate(${-value}deg)`
+    }
+    get fov() {return this._fov}
+    set fov(value) {
+        this._fov = value
+        scene.style.width = `${1/value*100/asp_x}%`
 
-      if (format == 'vertical') {
-          scene.style.height = `${1/value*100/asp_x*asp_y}%`
-      }
-      else {
-          scene.style.height = `${1/value*100/asp_y}%`
-      }
+        if (format == 'vertical') {
+            scene.style.height = `${1/value*100/asp_x*asp_y}%`
+        }
+        else {
+            scene.style.height = `${1/value*100/asp_y}%`
+        }
 
-  }
+    }
 }
 camera = new Camera({})
 camera.ui = new Entity({parent:camera, name:'ui', scale:[1,1], visible_self:false, z:-100, color:color.clear})
@@ -893,7 +893,7 @@ function Scene(options) {
     name = settings['name']
     _entity = new Entity(settings)
     print('------------texture:', options)
-    _entity.bg = new Entity({parent:_entity, scale_x:asp_x, scale_y:1/asp_y, texture:settings['texture']})
+    _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov, texture:settings['texture']})
     state_handler.states[name] = _entity
     return _entity
 }
