@@ -886,15 +886,16 @@ function Canvas(options) {
 }
 
 function Scene(options) {
-    settings = {visible_self:false, on_enter:null}
+    settings = {visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null}
     for (const [key, value] of Object.entries(options)) {
         settings[key] = value
     }
     name = settings['name']
     _entity = new Entity(settings)
-    print('------------texture:', options)
-    _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov, texture:settings['texture']})
-    state_handler.states[name] = _entity
+    if (settings['texture']) {
+        _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov, texture:settings['texture']})
+    }
+    scene_handler.states[name] = _entity
     return _entity
 }
 class StateHandler {
@@ -912,7 +913,6 @@ class StateHandler {
 
     get state() {return this._state}
     set state(value) {
-        print('goto state:', value, this.fade)
         if (this.fade && (value != this._state)) {
             print('fade in overlay')
             camera.overlay.animate('alpha', 1, .2)
@@ -939,21 +939,25 @@ class StateHandler {
                 }
             }
             else {
-                entity.enabled = false}
+                entity.enabled = false
+                if (entity.on_exit) {
+                    entity.on_exit()
+                }
             }
+        }
 
         this._state = value
     }
 }
 
-state_handler = new StateHandler({fade:true})
+scene_handler = new StateHandler({fade:true})
 
 function goto_scene(scene_name, fade=True) {
     if (!fade) {
-        state_handler.hard_state = scene_name
+        scene_handler.hard_state = scene_name
         return
     }
-    state_handler.state = scene_name
+    scene_handler.state = scene_name
 }
 
 class HealthBar extends Entity {
