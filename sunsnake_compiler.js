@@ -1,5 +1,5 @@
 print = console.log
-_class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField', 'StateHandler', 'Scene', ]
+_class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField', 'StateHandler', 'Scene', 'Array2D', ]
 _language = 'sunsnake'
 
 Array.prototype.at = function(i) {
@@ -119,6 +119,11 @@ function compile(script) {
             content = [key, value]
             extra_replacements.push(content)
             lines[i] = ''
+            continue
+        }
+        if (lines[i].trimStart().startsWith('import ')) {
+            module_name = lines[i].slice(7)
+            lines[i] = `__import__('${module_name}')`
             continue
         }
         for (e of extra_replacements) {
@@ -372,8 +377,11 @@ function convert_arguments(line, class_name) {
         new_arguments = arguments.replace(function_definition, `[INLINE_FUNC_PLACEHOLDER]`)
     }
 
+    if (!new_arguments.includes('=')) {
+        return line
+    }
     keys = new_arguments.split(',').map(e => e.split('=')[0])
-    if (!keys.includes('name')) {
+    if (!keys.includes('name') && class_name == 'Entity') {
         if (line.includes(`= new ${class_name}`)) {
             variable_name = line.split(`= new ${class_name}`)[0].trimStart()
             if (variable_name.startsWith('let ')) {
@@ -440,6 +448,7 @@ function int(value) {
 }
 
 function Array_2d(w, h, default_value=0) {
+    print('deprecated: Array_2d. Use Array2D')
     var tiles = new Array(w)
     for (var i = 0; i < tiles.length; i++) {
         tiles[i] = new Array(h);
@@ -447,6 +456,41 @@ function Array_2d(w, h, default_value=0) {
     }
     return tiles
 }
+
+class Array2D {
+    constructor(width, height, default_value = 0) {
+        this.width = width;
+        this.height = height;
+        this.data = new Array(width);
+        for (let i = 0; i < width; i++) {
+            this.data[i] = new Array(height).fill(default_value);
+        }
+    }
+    get(x, y) {
+        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+            return this.data[x][y];
+        }
+        return null; // Return null if out of bounds
+    }
+
+    set(x, y, value) {
+        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+            this.data[x][y] = value;
+        }
+    }
+    // Overload the [] operator
+    at(x) {
+        return {
+            get: (y) => this.get(x, y),
+            set: (y, value) => this.set(x, y, value)
+        };
+    }
+    flatten() {
+        return this.data.reduce((flat, row) => flat.concat(row), []);
+    }
+}
+
+
 function Array_3d(w, h, d) {
     var arr = new Array(w);
 
@@ -511,16 +555,60 @@ Array.prototype.take_last = function (n) {
 function dict(values={}) {
     return values
 }
+
+
+
 __name__ = null // for python compability
 __autocompile__ = true
 
 var scripts = document.getElementsByTagName("script")
+
+
 for (var script of scripts) {
     if (script.type == 'text/sunsnake') {
         print('compile:', script)
-        if (script.textContent) {
+        if (script.textContent) {   // inline script content
             compiled_code = compile(script.textContent)
             eval(compiled_code)
         }
+        else if (script.src) {
+            // Fetch the content from the src attribute if it exists
+            fetch(script.src)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    compiled_code = compile(data);
+                    eval(compiled_code);
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        }
     }
+}
+
+function __import__(url) {
+    print('importing:', url)
+    if (!url.includes('.')) {
+        url = url + '.sunsnake'
+    }
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(data => {
+            // Assuming `compile` is a function that compiles your custom script
+            const compiled_code = compile(data);
+            eval(compiled_code);
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
 }
