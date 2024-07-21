@@ -123,7 +123,7 @@ function compile(script) {
         }
         if (lines[i].trimStart().startsWith('import ')) {
             module_name = lines[i].slice(7)
-            lines[i] = `__import__('${module_name}')`
+            lines[i] = `(async () => await __import__('${module_name}'))();`
             continue
         }
         for (e of extra_replacements) {
@@ -591,24 +591,16 @@ for (var script of scripts) {
     }
 }
 
-function __import__(url) {
-    print('importing:', url)
+async function __import__(url) {
+    console.log('importing:', url);
     if (!url.includes('.')) {
-        url = url + '.sunsnake'
+        url = url + '.sunsnake';
     }
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(data => {
-            // Assuming `compile` is a function that compiles your custom script
-            const compiled_code = compile(data);
-            eval(compiled_code);
-        })
-        .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-        });
+    const response = await fetch(url).then();
+    if (!response.ok) {
+        throw new Error(`Failed to fetch module: ${response.statusText}`);
+    }
+    const data = await response.text();
+    const compiled_code = compile(data);
+    eval(compiled_code);
 }
