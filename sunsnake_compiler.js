@@ -24,6 +24,9 @@ function compile(script) {
     script = script.replaceAll('+\n', '+')
     script = script.replaceAll(' == ', ' === ')
     script = script.replaceAll('.index(', '.indexOf(')
+    script = script.replaceAll(' self.', ' this.')
+    script = script.replaceAll('(self.', '(this.')
+    // script = script.replaceAll('(self.', '(this.')
 
     var all_lines = script.split('\n');
     var lines = []
