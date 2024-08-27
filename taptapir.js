@@ -19,7 +19,7 @@ style.textContent = `
   touch-action: none;
   width:100%; height:100%; position:absolute; top:50%; left:50%; will-change: transform;
   transform:translate(-50%, -50%); color:black; background-size: 100% 100%; padding:0; border-width:0px;
-  visibility: 'visible'; display:inherit; image-rendering: pixelated;
+  visibility: 'visible'; display:inherit; image-rendering: auto;
   background-repeat:repeat;
   white-space: pre;
 }
@@ -148,6 +148,15 @@ function set_orientation(value) {
     }
 }
 set_orientation('vertical')
+
+function load_font(name) {
+    style.textContent += `
+@font-face {
+    font-family: '${name}';
+    src: url('${name}.ttf');
+}
+`
+}
 
 
 function rgb(r, g, b) {return [parseInt(r*255), parseInt(g*255), parseInt(b*255)]}
@@ -561,6 +570,11 @@ class Entity {
         this._tile = value
         this.model.style.backgroundPosition = `${(this.tileset_size[0]-1)*value[0]*100}% ${(this.tileset_size[1]-1)*(this.tileset_size[1]-1-value[1])*100}%`
     }
+    get texture_offset() {return this._texture_offset}
+    set texture_offset(value) {        // [0,0] is in lower left
+        this._texture_offset = value
+        this.model.style.backgroundPosition = `${int(value[0]*this.model.clientWidth)}px ${-int(value[1]*this.model.clientHeight)}px`
+    }
 
     get roundness() {return this._roundness}
     set roundness(value) {
@@ -582,6 +596,7 @@ class Entity {
     }
     get font() {return this.style.fontFamily}
     set font(value) {
+        print('set fonr to ', value)
         this.model.style.fontFamily = value
     }
 
@@ -1247,14 +1262,19 @@ mouse.update = () => {      // simulate pointermove. can for example be used to 
 timeout_id = 0
 function invoke(func, delay) {
     timeout_id = setTimeout(func, delay*1000)
+    return timeout_id
 }
 function after(delay, func) {
     timeout_id = setTimeout(func, delay*1000)
+    return timeout_id
 }
 function stop_all_invokes() {
     for (let i = timeout_id; i >= 0; i--) {
         window.clearInterval(i);
     }
+}
+function stop_invoke(i) {
+    window.clearInterval(i)
 }
 
 function distance(a, b) {
