@@ -262,6 +262,14 @@ function set_fullscreen(value) {
     }
 }
 
+curves = {
+    'linear' : (a, b, t) => {
+        return lerp(a, b, t)},
+
+    'out_expo' : (a, b, t) => {
+        return lerp(a, b, t*t)}
+}
+
 ASSETS_FOLDER = ''
 TAPTAPIR_TEXTURES = {}
 entities = []
@@ -697,7 +705,7 @@ class Entity {
         }
     }
 
-    animate(variable_name, target_value, duration=.1) {
+    animate(variable_name, target_value, duration=.1, curve=curves.linear) {
         // print('animate:', variable_name, target_value)
         if (!this.enabled) {return false}
         if (duration <= 1/60) {
@@ -721,7 +729,8 @@ class Entity {
                         if (!entity.enabled) {
                             return false}
                         var t = i / duration / 60
-                        entity[variable_name] = lerp(start_value, target_value, t)
+                        // entity[variable_name] = lerp(start_value, target_value, t)
+                        entity[variable_name] = curve(start_value, target_value, t)
                     },
                     1000*i/60
                 )
@@ -977,13 +986,13 @@ function goto_scene(scene_name, fade=True) {
 
 class HealthBar extends Entity {
     constructor(options=false) {
-        let settings = {min:0, max:100, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25}
+        let settings = {min:0, max:100, color:'#222222', bar_color:'bb0505', scale:[.8,.05], roundness:.25, text_color:'#dddddd', text_size:2}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
         super(settings)
         this.bar = new Entity({parent:this, origin:[-.5,0], x:-.5, roundness:.25, scale_x:.25, color:settings['bar_color']})
-        this.text_entity = new Entity({parent:this, text:'hii', text_color:'#dddddd', color:color.clear, text_origin:[0,0], text_size:2})
+        this.text_entity = new Entity({parent:this, text:'hii', text_color:settings['text_color'], color:color.clear, text_origin:[0,0], text_size:settings['text_size']})
         this.value = settings['max']
     }
 
