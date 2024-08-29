@@ -264,10 +264,12 @@ function set_fullscreen(value) {
 
 curves = {
     'linear' : (a, b, t) => {
-        return lerp(a, b, t)},
+        return lerp(a, b, t)
+    },
 
     'out_expo' : (a, b, t) => {
-        return lerp(a, b, t*t)}
+        return lerp(a, b, t*t)
+    }
 }
 
 ASSETS_FOLDER = ''
@@ -729,8 +731,13 @@ class Entity {
                         if (!entity.enabled) {
                             return false}
                         var t = i / duration / 60
-                        // entity[variable_name] = lerp(start_value, target_value, t)
-                        entity[variable_name] = curve(start_value, target_value, t)
+                        if (typeof curve === 'function') {
+                            entity[variable_name] = curve(start_value, target_value, t)
+                        }
+                        else {
+                            // fallback to linear
+                            // entity[variable_name] = lerp(start_value, target_value, t)                            
+                        }
                     },
                     1000*i/60
                 )
