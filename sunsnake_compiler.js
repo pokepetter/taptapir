@@ -1,5 +1,5 @@
 print = console.log
-_class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField', 'StateHandler', 'Scene', 'Array2D', ]
+_class_names = ['Entity', 'Button', 'Text', 'HealthBar', 'RainbowSlider', 'InputField', 'StateHandler', 'Scene', 'Array2D', 'Video']
 _language = 'sunsnake'
 
 Array.prototype.at = function(i) {
@@ -427,6 +427,7 @@ floor = Math.floor
 ceil = Math.ceil
 math = Math
 sqrt = Math.sqrt
+sin = Math.sin
 function round(value, digits=0) {
     return Number(Math.round(value+'e'+digits)+'e-'+digits);
 }
