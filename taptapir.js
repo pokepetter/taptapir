@@ -177,7 +177,7 @@ function hex_to_rgb(value) {
     }
 }
 // from: https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
-function hsv(h, s, v) {
+function hsv(h, s, v, a=1.0) {
     h /= 360;
     var r, g, b, i, f, p, q, t;
     if (arguments.length === 1) {
@@ -196,7 +196,7 @@ function hsv(h, s, v) {
         case 4: r = t, g = p, b = v; break;
         case 5: r = v, g = p, b = q; break;
     }
-    return [parseInt(r*255), parseInt(g*255), parseInt(b*255)];
+    return [parseInt(r*255), parseInt(g*255), parseInt(b*255), parseInt(a*255)];
 }
 
 function rgb_to_hsv(_rgb_color) {
@@ -583,7 +583,7 @@ class Entity {
     get texture_offset() {return this._texture_offset}
     set texture_offset(value) {        // [0,0] is in lower left
         this._texture_offset = value
-        this.model.style.backgroundPosition = `${int(value[0]*this.model.clientWidth)}px ${-int(value[1]*this.model.clientHeight)}px`
+        this.model.style.backgroundPosition = `${value[0]*this.model.clientWidth}px ${-value[1]*this.model.clientHeight}px`
     }
 
     get roundness() {return this._roundness}
@@ -754,6 +754,9 @@ class Entity {
                 )
             )
     }
+    shake() {
+
+    }
 
     fit_to_text() {
         this.model.style.width = 'fit-content'
@@ -800,6 +803,13 @@ function random_int(min, max) {
 }
 function random_choice(list) {
     return list[random_int(0, len(list)-1)]
+}
+function random_shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+    return array;
 }
 function random_color() {
     return rgb(Math.random(), Math.random(), Math.random())
@@ -1275,6 +1285,36 @@ mouse.update = () => {      // simulate pointermove. can for example be used to 
 //     }
 //
 // }
+function Video(options) {
+    print('----------------------', options)
+    settings = {visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null}
+    for (const [key, value] of Object.entries(options)) {
+        settings[key] = value
+    }
+    // name = settings['name']
+    _entity = new Entity(settings)
+    // let name = settings['name']
+
+    let video_entity = new Entity(settings) 
+    video_entity.video = document.createElement('video')
+    video_entity.video.src = settings['name']
+    video_entity.video.controls = false
+    video_entity.video.loop = false
+    video_entity.model.appendChild(video_entity.video)
+    video_entity.video.style.width = '100%'
+    video_entity.video.style.height = '100%'
+    video_entity.video.style.backgroundSize = '100% 100%'
+
+    video_entity.play = () => {video_entity.video.play()}
+    video_entity.pause = () => {video_entity.video.pause()}
+    video_entity.stop = () => {
+        video_entity.video.pause()
+        video_entity.video.currentTime = 0
+    }
+    return video_entity
+}
+
+
 timeout_id = 0
 function invoke(func, delay) {
     timeout_id = setTimeout(func, delay*1000)
@@ -1356,7 +1396,7 @@ function sample(population, k){
     return result;
     }
     
-    function grid_layout(l, options) {
+function grid_layout(l, options) {
     let settings = {spacing:[1.1,1.1], offset:[0,0], max_x:16}
     for (const [key, value] of Object.entries(options)) {
         print('setting', key, 'to', value)
