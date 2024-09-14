@@ -781,8 +781,26 @@ class Entity {
                 )
             )
     }
-    shake() {
 
+    appear() {
+        let target_scale_y = this.scale_y
+        let target_scale_x = this.scale_x
+        let target_text_alpha = this.text_alpha
+        this.scale = [0,0]
+        this.text_alpha = 0
+        this.enabled = True
+        this.animate('scale_y', target_scale_y, .25)
+        after(.25, () => {
+            this.animate('scale_x', target_scale_x, .5)
+            this.animate('text_alpha', target_text_alpha, .25)
+        })
+    }
+    close() {
+        this.animate('text_alpha', 0, .25)
+        this.animate('scale_y', 0, .25)
+        after(.25, () => {
+            this.animate('scale_x', 0, .5)
+        })
     }
 
     fit_to_text() {
