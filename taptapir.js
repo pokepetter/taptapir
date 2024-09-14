@@ -860,8 +860,7 @@ function lists_are_equal(array_a, array_b) {
     return true
 }
 
-
-class Camera{
+class Camera {
     constructor(options=null) {
         this.el = document.createElement('entity')
         _game_window.appendChild(this.el)
@@ -977,7 +976,7 @@ function Scene(options) {
 }
 class StateHandler {
     constructor (options) {
-        let settings = {states:{}, fade:false}
+        let settings = {states:{}, fade:false, fade_in_duration:.2, fade_out_duration:1}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
@@ -985,18 +984,19 @@ class StateHandler {
         camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-99, scale:[1.1,aspect_ratio*1.1]})
         this.states = settings['states']
         this.fade = settings['fade']
+        this.fade_in_duration = settings['fade_in_duration']
+        this.fade_out_duration = settings['fade_out_duration']
         this.state = Object.keys(this.states)[0]
     }
 
     get state() {return this._state}
     set state(value) {
         if (this.fade && (value != this._state)) {
-            print('fade in overlay')
-            camera.overlay.animate('alpha', 1, .2)
+            camera.overlay.animate('alpha', 1, this.fade_in_duration)
             setTimeout(() => {
-                camera.overlay.animate('alpha', 0, 1)
+                camera.overlay.animate('alpha', 0, this.fade_out_duration)
                 this.hard_state = value
-            }, 200)
+            }, this.fade_in_duration*1000)
         }
         else {
             this.hard_state = value
