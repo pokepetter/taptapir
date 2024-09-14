@@ -347,6 +347,7 @@ class Entity {
         this.on_enable = null
         this.on_disable = null
         this.color = '#ffffff'
+        this.text_color = color.black
         this.x = 0
         this.y = 0
         this.z = 0
@@ -630,7 +631,7 @@ class Entity {
     set text(value) {
         this.model.innerHTML = value
     }
-    get text_color() {return this.model.style.color}
+    get text_color() {return this._text_color}
     set text_color(value) {
         if (!(typeof value == "string")) {
             // print('set color:', value)
@@ -638,16 +639,21 @@ class Entity {
             if (value.length == 4) {
                 alpha = value[3]
             }
+            this._text_color = [value[0], value[1], value[2], alpha]
             value = `rgba(${value[0]},${value[1]},${value[2]},${alpha})`
         }
         this.model.style.color = value
     }
-    get text_alpha() {return this.text_color[3]}
+    get text_alpha() {
+        if (!this._text_color) {
+            return 1
+        }
+        return this.text_color[3]
+    }
     set text_alpha(value) {
-        print(value)
-        var current_color = this.color
-        current_color[3] = value
-        this.text_color = current_color
+        var current_text_color = this.text_color
+        current_text_color[3] = value
+        this.text_color = current_text_color
     }
     get text_size() {return this._text_size}
     set text_size(value) {
