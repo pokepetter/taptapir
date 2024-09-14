@@ -263,12 +263,27 @@ function set_fullscreen(value) {
 }
 
 curves = {
-    'linear' : (a, b, t) => {
-        return lerp(a, b, t)
+    'linear' : (t) => {
+        return t
     },
 
-    'out_expo' : (a, b, t) => {
-        return lerp(a, b, t*t)
+    'out_expo' : (t) => {
+        return -pow(2, -10 * t) + 1
+    },
+    'in_expo' : (t) => {
+        return pow(2, 10 * (t - 1))
+    },
+    'in_out_expo' : (t) => {
+        scaledTime = t * 2
+        scaledTime1 = scaledTime - 1
+
+        if (scaledTime < 1) {
+            return .5 * pow(2, 10 * scaledTime1)
+        }
+        return .5 * (-pow(2, -10 * scaledTime1) + 2)
+    },
+    'in_out_sine' : (t) => {
+        return -.5 * (cos(pi * t) - 1)
     }
 }
 
