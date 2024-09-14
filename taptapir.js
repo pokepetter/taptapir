@@ -928,6 +928,24 @@ class Camera {
         }
 
     }
+
+    shake(duration=.2, magnitude=1, speed=.05, direction=(1,1)) {
+        let original_xy = this.xy
+
+        for (let _i of range(int(duration / speed))) {
+
+            after(i*speed, () => {
+                this.xy = [
+                    original_xy[0] + (random_int(-1, 1)*.1 * magnitude * direction[0]),
+                    original_xy[1] + (random_int(-1, 1)*.1 * magnitude * direction[1])
+                ]
+            })
+            after(duration, () => {
+                this.xy = original_xy
+            })
+            
+        }
+    }
 }
 camera = new Camera({})
 camera.ui = new Entity({parent:camera, name:'ui', scale:[1,1], visible_self:false, z:-100, color:color.clear})
