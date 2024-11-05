@@ -1003,16 +1003,28 @@ function Canvas(options) {
     return e
 }
 
-function Scene(options) {
-    settings = {visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null}
-    for (const [key, value] of Object.entries(options)) {
+function Scene(input) {
+    settings = {parent:scene, visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null}
+    _bg_color = input.color
+    input.color = null
+    
+    for (const [key, value] of Object.entries(input)) {
         settings[key] = value
     }
-    name = settings['name']
+    
     _entity = new Entity(settings)
-    if (settings['texture']) {
-        _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov, texture:settings['texture']})
+
+    if (input.texture || _bg_color) {
+        _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov})
+        if (input.texture) {
+            _entity.bg.texture = input.texture
+        }
+        if (_bg_color) {
+            _entity.bg.color = _bg_color
+        }
     }
+    scene_handler.states.push(_entity)
+
     if (AUTOPARENT_TO_SCENE) {
         LAST_SCENE = _entity
         // print('set LASTSCENE to:', _entity.name)
@@ -1021,17 +1033,19 @@ function Scene(options) {
 }
 class StateHandler {
     constructor (options) {
-        let settings = {states:{}, fade:false, fade_in_duration:.2, fade_out_duration:1}
+        let settings = {states:[], fade:false, fade_in_duration:.5, fade_out_duration:1}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
-
+        if (!camera.overlay) {
         camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-99, scale:[1.1,aspect_ratio*1.1]})
+            // print('make new overlay')
+        }
         this.states = settings['states']
         this.fade = settings['fade']
         this.fade_in_duration = settings['fade_in_duration']
         this.fade_out_duration = settings['fade_out_duration']
-        this.state = Object.keys(this.states)[0]
+        this.state = this.states[0]
     }
 
     get state() {return this._state}
@@ -1052,9 +1066,8 @@ class StateHandler {
         if (this._state === value) {
             return
         }
-        for (const [key, entity] of Object.entries(this.states)) {
-            // print('----', key, value)
-            if (key == value || value == entity) {
+        for (let entity of this.states) {
+            if (value === entity || value === entity.name) {
                 entity.enabled = true
                 if (entity.on_enter) {
                     entity.on_enter()
@@ -1074,12 +1087,12 @@ class StateHandler {
 
 scene_handler = new StateHandler({fade:true})
 
-function goto_scene(scene_name, fade=True) {
+function goto_scene(scene, fade=True) {
     if (!fade) {
-        scene_handler.hard_state = scene_name
+        scene_handler.hard_state = scene
         return
     }
-    scene_handler.state = scene_name
+    scene_handler.state = scene
 }
 
 class HealthBar extends Entity {
