@@ -297,7 +297,7 @@ LAST_SCENE = null
 DEFAULT_FONT = null
 TEXT_SIZE_MULTIPLIER = 1
 
-class Entity {
+class Entity {    
     constructor(options=null) {
         if (!('type' in options)) {
             options['type'] = 'entity'
@@ -347,7 +347,7 @@ class Entity {
             options['parent'] = LAST_SCENE
         }
         else {
-        this.parent = scene
+            this.parent = scene
         }
         if (DEFAULT_FONT) {
             this.font = DEFAULT_FONT
@@ -441,7 +441,7 @@ class Entity {
         }
         else {
             this.el.style.visibility = 'hidden'
-            }
+        }
  
         this._enabled = value
 
@@ -1038,7 +1038,7 @@ class StateHandler {
             settings[key] = value
         }
         if (!camera.overlay) {
-        camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-99, scale:[1.1,aspect_ratio*1.1]})
+            camera.overlay = new Entity({parent:camera, name:'overlay', color:color.black, alpha:0, z:-99, scale:[1.1,aspect_ratio*1.1]})
             // print('make new overlay')
         }
         this.states = settings['states']
@@ -1148,7 +1148,12 @@ class RainbowSlider extends Entity {
 
     update() {
         if (this.active && mouse.left && mouse.hovered_entity === this) {
-            this.value = int((mouse.point[0]+.5+(1/this.max)) * this.max)
+            if (this.rotation == 0) {
+                this.value = int((mouse.point[0]+.5+(1/this.max)) * this.max)
+            }
+            else if (this.rotation == -90) {
+                this.value = int((mouse.point[1]+.5+(1/this.max)) * this.max)
+            }
         }
     }
 
@@ -1221,6 +1226,10 @@ function _mousedown(event) {
 }
 document.addEventListener('pointerdown', _mousedown)
 
+const click_animation = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'texture':'impact_effect.gif', 'enabled':false, 'alpha':.5})
+if (!click_animation.texture) {
+    click_animation.visible = false
+}
 
 time_of_press = 0
 function _handle_mouse_click(e) {
@@ -1237,6 +1246,9 @@ function _handle_mouse_click(e) {
     if (element_hit && entity) {
         if (entity.on_click) {
             entity.on_click()
+            click_animation.xy = mouse.position
+            click_animation.enabled = True
+            click_animation.texture = 'impact_effect.gif'
         }
         if (entity.draggable) {
             window_position = _game_window.getBoundingClientRect()
@@ -1305,6 +1317,7 @@ function _onmousemove(event) {
         var x = event.clientX - rect.left; //x position within the element.
         var y = event.clientY - rect.top;  //y position within the element.
         mouse.point = [(x/rect.width)-.5, .5-(y/rect.height)]
+        // print(mouse.point)
     }
     element_hit = document.elementFromPoint(event.pageX - window.pageXOffset, event.pageY - window.pageYOffset);
     _entity = entities[element_hit.entity_index]
