@@ -290,6 +290,8 @@ curves = {
 ASSETS_FOLDER = ''
 TAPTAPIR_TEXTURES = {}
 entities = []
+AUTOPARENT_TO_SCENE = true
+LAST_SCENE = null
 
 class Entity {
     constructor(options=null) {
@@ -337,8 +339,10 @@ class Entity {
             scene.appendChild(this.el)
         }
 
-        // if (!'parent' in options) {
-            // print('default to scene')
+        if ((!options['parent'] || options['parent']==camera.ui) && AUTOPARENT_TO_SCENE===true && LAST_SCENE!==null) {
+            options['parent'] = LAST_SCENE
+        }
+        else {
         this.parent = scene
         // }
 
@@ -1007,7 +1011,10 @@ function Scene(options) {
     if (settings['texture']) {
         _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov, texture:settings['texture']})
     }
-    scene_handler.states[name] = _entity
+    if (AUTOPARENT_TO_SCENE) {
+        LAST_SCENE = _entity
+        // print('set LASTSCENE to:', _entity.name)
+    }
     return _entity
 }
 class StateHandler {
