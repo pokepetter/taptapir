@@ -56,10 +56,11 @@ input, textarea {
   height: 100%;
   width: 100%;
   font-size: inherit;
-  font-family: monospace;
+  font-family: inherit;
   border-radius: inherit;
   background-color: inherit;
   border-width: inherit;
+  border-style: inherit;
   text-indent: .5em;
   resize: none;
   color: inherit;
@@ -243,6 +244,7 @@ color = {
   magenta:       hsv(300, 1, 1),
   pink:          hsv(330, 1, 1),
   clear:         [0, 0, 0, 0],
+  text_color:    hsv(0,0,.05),
 }
 
 function set_window_color(value) {_game_window.style.backgroundColor = value}
@@ -292,6 +294,8 @@ TAPTAPIR_TEXTURES = {}
 entities = []
 AUTOPARENT_TO_SCENE = true
 LAST_SCENE = null
+DEFAULT_FONT = null
+TEXT_SIZE_MULTIPLIER = 1
 
 class Entity {
     constructor(options=null) {
@@ -344,14 +348,17 @@ class Entity {
         }
         else {
         this.parent = scene
-        // }
+        }
+        if (DEFAULT_FONT) {
+            this.font = DEFAULT_FONT
+        }
 
         this.children = []
         this._enabled = true
         this.on_enable = null
         this.on_disable = null
-        this.color = '#ffffff'
-        this.text_color = color.black
+        this.color = color.white
+        this.text_color = color.text_color
         this.x = 0
         this.y = 0
         this.z = 0
@@ -627,7 +634,7 @@ class Entity {
     }
     get font() {return this.style.fontFamily}
     set font(value) {
-        print('set fonr to ', value)
+        // print('set font color. ', value)
         this.model.style.fontFamily = value
     }
 
@@ -635,7 +642,7 @@ class Entity {
     set text(value) {
         this.model.innerHTML = value
     }
-    get text_color() {return this._text_color}
+    get text_color() {return this._text_color?? color.white}
     set text_color(value) {
         if (!(typeof value == "string")) {
             // print('set color:', value)
@@ -649,20 +656,21 @@ class Entity {
         this.model.style.color = value
     }
     get text_alpha() {
-        if (!this._text_color) {
-            return 1
+        if (this._text_color === undefined) {
+            return 1.0
         }
         return this.text_color[3]
     }
     set text_alpha(value) {
         var current_text_color = this.text_color
+        // print('----------', this.text_color)
         current_text_color[3] = value
         this.text_color = current_text_color
     }
     get text_size() {return this._text_size}
     set text_size(value) {
         this._text_size = value
-        this.model.style.fontSize = `${value*scale}vh`
+        this.model.style.fontSize = `${value*scale*1*TEXT_SIZE_MULTIPLIER}em`
     }
 
     get text_origin() {return this._text_origin}
