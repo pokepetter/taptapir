@@ -82,6 +82,9 @@ function compile(script) {
         quotes.push(...all_lines[i].matchAll(regexp_backtick))
 
         for (var j=0; j<quotes.length; j++) {
+            if (quotes[j][1].startsWith('#')) {
+                continue
+            }
             if (quotes[j][1].length > 0) {
                 strings.push(quotes[j][1])
                 // print('TEXT_CONTENT_$', string_index, quotes[j][1])
@@ -206,7 +209,7 @@ function compile(script) {
         // dict iteration
         // print('ITERATE DICT', lines[i].trimStart().startsWith('for key, value in '), lines[i].includes('.items()'))
         else if (lines[i].trimStart().startsWith('for key, value in ') && lines[i].includes('.items()')) {
-            print('ITERATE DICT')
+            // print('ITERATE DICT')
             var dict_name = lines[i].split('for key, value in ')[1].split('.items()')[0]
             lines[i] = lines[i].replace('for key, value in ', 'for (let [key, value] of ')
             lines[i] = lines[i].replace(`${dict_name}.items()`, `Object.entries(${dict_name}))`)
@@ -220,7 +223,7 @@ function compile(script) {
 
             // normal for loop
             if (!elements.includes(', ')) {
-                lines[i] = lines[i].replace('for ', 'for (var ')
+                lines[i] = lines[i].replace('for ', 'for (let ')
                 lines[i] = lines[i].replace(' in ', ' of ')
                 lines[i] = lines[i] + ')'
             }
@@ -428,6 +431,8 @@ ceil = Math.ceil
 math = Math
 sqrt = Math.sqrt
 sin = Math.sin
+pow = Math.pow
+
 function round(value, digits=0) {
     return Number(Math.round(value+'e'+digits)+'e-'+digits);
 }
@@ -556,10 +561,21 @@ Array.prototype.take_last = function (n) {
     return this.splice(-n)
 }
 
+Object.prototype.keys = function() {
+    return Object.keys(this)
+}
+Object.prototype.values = function() {
+    return Object.values(this)
+}
+
 function dict(values={}) {
     return values
 }
 
+
+function hasattr(class_instance, name) {
+    return class_instance.hasOwnProperty(name)
+}
 
 
 __name__ = null // for python compability
