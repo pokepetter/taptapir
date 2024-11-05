@@ -437,18 +437,12 @@ class Entity {
     get enabled() {return this._enabled}
     set enabled(value) {
         if (value) {
-            this.el.style.visibility = 'visible'
-            for (var c of this.descendants) {
-                c.style.visibility = c.style.original_visibility
-            }
+            this.el.style.visibility = 'inherit'
         }
         else {
             this.el.style.visibility = 'hidden'
-            for (var c of this.descendants) {
-                c.style.original_visibility = c.style.visibility
-                c.style.visibility = 'inherit'
             }
-        }
+ 
         this._enabled = value
 
         if (value && this.on_enable) {
