@@ -2,7 +2,7 @@ from sunsnaker import sunsnaker
 from ursina.array_tools import Array2D as Array_2d
 
 
-# @sunsnaker      # remove this to run in python mode
+@sunsnaker      # remove this to run in python mode
 def grid_to_cubes(grid, grid_size):
     def volume(e):
         return e[0] * e[1] * e[2]
