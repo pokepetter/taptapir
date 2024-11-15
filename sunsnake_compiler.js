@@ -581,8 +581,12 @@ function hasattr(class_instance, name) {
 __name__ = null // for python compability
 __autocompile__ = true
 
-var scripts = document.getElementsByTagName("script")
-
+if (typeof document !== "undefined") {
+    var scripts = document.getElementsByTagName("script")
+}
+else {
+    var scripts = []
+}
 
 for (var script of scripts) {
     if (script.type == 'text/sunsnake') {
