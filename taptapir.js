@@ -33,7 +33,7 @@ style.textContent = `
   white-space: pre-wrap;
 }
 fullscreen_button {padding: 4px 4px; width: 64px; height: 64px; background-color: #555; border-radius: .2em; border-width: 0px;
-  text-decoration: none; color: white; font-size: 50.0px; z-index: 1; position: absolute; text-align: center; right: 0%;
+  text-decoration: none; color: white; font-size: 1vw; z-index: 1; position: absolute; text-align: center; right: 0%;
 }
 body {
   margin:0;
@@ -664,7 +664,12 @@ class Entity {
     get text_size() {return this._text_size}
     set text_size(value) {
         this._text_size = value
-        this.model.style.fontSize = `${value*scale*1*TEXT_SIZE_MULTIPLIER}em`
+        if (format == 'vertical') {
+            this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vh`
+        }
+        else {
+            this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vw`
+        }
     }
 
     get text_origin() {return this._text_origin}
