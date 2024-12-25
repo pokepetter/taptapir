@@ -567,6 +567,17 @@ Object.prototype.keys = function() {
 Object.prototype.values = function() {
     return Object.values(this)
 }
+Object.prototype.includes = function(key) { // to allow for if name in dict, instad of having to do if name in dict.keys()
+    return Object.keys(this).includes(key);
+};
+
+function tuple(arr) {
+    return arr
+}
+
+function sorted(arr) {
+    return arr.slice().sort((a, b) => a - b) // Sort a copy of the array
+}
 
 function dict(values={}) {
     return values
