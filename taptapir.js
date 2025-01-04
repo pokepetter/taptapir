@@ -1205,6 +1205,30 @@ class InputField extends Entity {
         }
     }
 }
+class TextField extends Entity {
+    constructor(options=false) {
+        let settings = {roundness:.5, color:color.smoke, text_size:2, value:''}
+        for (const [key, value] of Object.entries(options)) {
+            settings[key] = value
+        }
+        super(settings)
+        this.input_field = document.createElement('textarea')
+        this.model.appendChild(this.input_field)
+        this.input_field.onkeyup = () => {
+            if (this.on_value_changed) {
+                this.on_value_changed()
+            }
+        }
+        this.value = settings['value']
+    }
+
+    get value() {return this.input_field.value}
+    set value(x) {
+        if (this.input_field) {
+            this.input_field.value = x
+        }
+    }
+}
 
 
 mouse = {x:0, y:0, position:[0,0], left:false, middle:false, pressure:0.0, hovered_entity:null,
@@ -1231,10 +1255,10 @@ function _mousedown(event) {
 }
 document.addEventListener('pointerdown', _mousedown)
 
-const click_animation = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'texture':'impact_effect.gif', 'enabled':false, 'alpha':.5})
-if (!click_animation.texture) {
-    click_animation.visible = false
-}
+// const click_animation = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'texture':'impact_effect.gif', 'enabled':false, 'alpha':.5})
+// if (!click_animation.texture) {
+//     click_animation.visible = false
+// }
 
 time_of_press = 0
 function _handle_mouse_click(e) {
@@ -1251,9 +1275,11 @@ function _handle_mouse_click(e) {
     if (element_hit && entity) {
         if (entity.on_click) {
             entity.on_click()
-            click_animation.xy = mouse.position
-            click_animation.enabled = True
-            click_animation.texture = 'impact_effect.gif'
+            // if (click_animation.texture) {
+            //     click_animation.xy = mouse.position
+            //     click_animation.enabled = True
+            //     click_animation.texture = 'impact_effect.gif'
+            // }
         }
         if (entity.draggable) {
             window_position = _game_window.getBoundingClientRect()
