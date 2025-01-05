@@ -24,21 +24,23 @@ function compile(script) {
     script = script.replaceAll('+\n', '+')
     script = script.replaceAll(' == ', ' === ')
     script = script.replaceAll('.index(', '.indexOf(')
-    script = script.replaceAll(' self.', ' this.')
-    script = script.replaceAll('(self.', '(this.')
+    // script = script.replaceAll(' self.', ' this.')
+    // script = script.replaceAll('(self.', '(this.')
     // script = script.replaceAll('(self.', '(this.')
 
-    var all_lines = script.split('\n');
+    var all_lines = script.split('\n')
     var lines = []
     lines.push('\n')
 
     strings = []
     string_index = 0
-    const regexp = '\'(.*?)\'';
-    const regexp_backtick = '\`(.*?)\`';
+    const regexp = '\'(.*?)\''
+    const regexp_backtick = '\`(.*?)\`'
 
     extra_replacements = []
-    is_in_multiline_string = false;
+    is_in_multiline_string = false
+    
+    prev_created_variable = null    // for storing the recently defined variable starting with $, so it can be references with '_.'
 
     for (var i=0; i<all_lines.length; i++) {
         if (!all_lines[i].trim()) {
@@ -266,7 +268,23 @@ function compile(script) {
             lines[i] = lines[i].replace('```', '``)')
         }
 
+        if (lines[i].startsWith('$')) {
+            prev_created_variable = lines[i].substring(1).split('=')[0].trimEnd()
+            lines[i] = lines[i].split('$')[1]
+        }
+        else if (lines[i].includes('_.') && prev_created_variable) {
+            // indent = get_indent(lines[i])
+            // start = '    '.repeat(indent)
+            // end = lines[i].trimStart().substring(1)
+            // end = end.replaceAll('_.', prev_created_variable)
+            // print('---:', lines[i].trimStart().substring(1))
 
+            // lines[i] = start + prev_created_variable + end
+            lines[i] = lines[i].replaceAll('_.', prev_created_variable+'.')
+            lines[i] = lines[i].replaceAll('_,', prev_created_variable+',')
+        }
+
+        // convert dict(...) to {...}
         for (var class_name of ['dict', ]) {
             if (lines[i].includes(`${class_name}({`)) {
                 continue
@@ -276,6 +294,7 @@ function compile(script) {
             }
         }
 
+        // add 'new' in front of class initializations
         for (var class_name of _class_names) {
             is_first_word = lines[i].startsWith(`${class_name}(`) ? '' : ' '        // don't add space if line starts with 'Entity(', do add otherwise, to ensure we match the whole name
             if (lines[i].includes(`${is_first_word}${class_name}(`)) {
@@ -287,6 +306,8 @@ function compile(script) {
             }
         }
 
+        
+        // units
         for (var n=0; n<10; n++) {
             lines[i] = lines[i].replaceAll(`${n}ms`, `${n}*.001`)
             lines[i] = lines[i].replaceAll(`${n}s`, `${n}`)
