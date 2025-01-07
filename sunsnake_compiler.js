@@ -322,14 +322,15 @@ function compile(script) {
     after_statement_indents = []
 
     for (var i=1; i<lines.length; i++) {
-        if (lines[i-1].endsWith('=') || lines[i-1].endsWith('+') || lines[i-1].endsWith('(')) {
+        prev_line = lines[i-1].trimEnd()
+        if (prev_line.endsWith('=') || prev_line.endsWith('+') || prev_line.endsWith('(')) {
             continue
         }
         prev_line_indent = get_indent(lines[i-1])
         current_line_indent = get_indent(lines[i])
 
         if (current_line_indent > prev_line_indent) {
-            lines[i-1] += ' {'
+            lines[i-1] = prev_line + ' {'
             current_indent = current_line_indent
         }
         if (current_line_indent < prev_line_indent) {
