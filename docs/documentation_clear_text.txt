@@ -36,7 +36,7 @@ for i, e in enumerate(my_list):
 ```
 
 ```
-Array_2d(width, height)
+Array2D(width, height)
 ```
 
 

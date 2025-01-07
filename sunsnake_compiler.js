@@ -489,13 +489,21 @@ function Array_2d(w, h, default_value=0) {
 }
 
 class Array2D {
-    constructor(width, height, default_value = 0) {
+    constructor(width, height, default_value=0) {
         this.width = width;
         this.height = height;
         this.data = new Array(width);
         for (let i = 0; i < width; i++) {
             this.data[i] = new Array(height).fill(default_value);
         }
+        return new Proxy(this, {
+            get: (target, prop) => {
+                if (typeof prop === "symbol" || isNaN(prop)) {
+                    return target[prop]; // Handle non-numeric properties
+                }
+                return target.data[prop]; // Access rows directly
+            }
+        });
     }
     get(x, y) {
         if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
@@ -508,13 +516,6 @@ class Array2D {
         if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
             this.data[x][y] = value;
         }
-    }
-    // Overload the [] operator
-    at(x) {
-        return {
-            get: (y) => this.get(x, y),
-            set: (y, value) => this.set(x, y, value)
-        };
     }
     flatten() {
         return this.data.reduce((flat, row) => flat.concat(row), []);
