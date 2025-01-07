@@ -558,7 +558,7 @@ class Entity {
                 this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}")`
             }
             else {
-                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random.int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random.randint(0,999)}")`   // add random number so the gif restarts when setting .texture again
             }
             this.color = color.clear
             return
@@ -583,7 +583,7 @@ class Entity {
         }
 
         else if (name.endsWith('.gif')) {   // .gif (ensure animation replays on reuse)
-            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}?${random.int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}?${random.randint(0,999)}")`   // add random number so the gif restarts when setting .texture again
             this.color = color.clear
             return
         }
@@ -865,14 +865,14 @@ function clamp(num, min, max) {
 random = {
     value: Math.random,
     random: Math.random,
-    int: function (min, max) {
+    randint: function (min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     ,
     choice: function (list) {
-        return list[random.int(0, len(list)-1)]
+        return list[random.randint(0, len(list)-1)]
     }
     ,
     shuffle: function (array) {
@@ -971,8 +971,8 @@ class Camera {
 
             after(i*speed, () => {
                 this.xy = [
-                    original_xy[0] + (random.int(-1, 1)*.1 * magnitude * direction[0]),
-                    original_xy[1] + (random.int(-1, 1)*.1 * magnitude * direction[1])
+                    original_xy[0] + (random.randint(-1, 1)*.1 * magnitude * direction[0]),
+                    original_xy[1] + (random.randint(-1, 1)*.1 * magnitude * direction[1])
                 ]
             })
             after(duration, () => {
