@@ -40,6 +40,7 @@ body {
   background-color:'#111';
   font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
   overscroll-behavior-y: contain;
+  touch-action: none;
 }
 #loading_text {
   position: absolute;
@@ -1238,22 +1239,6 @@ mouse = {x:0, y:0, position:[0,0], left:false, middle:false, pressure:0.0, hover
     }
 }
 
-function _mousedown(event) {
-    _input(event)
-    if (event.button > 0) {
-        return
-    }
-
-    // if (event.pointerType == 'mouse' || event.pointerType == 'touch') {
-    //     mouse.pressure = 1
-    // }
-    // else {
-    //     mouse.pressure = event.originalEvent.pressure
-    // }
-    _update_mouse_position(event)
-    _handle_mouse_click(event)
-}
-document.addEventListener('pointerdown', _mousedown)
 
 // const click_animation = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'texture':'impact_effect.gif', 'enabled':false, 'alpha':.5})
 // if (!click_animation.texture) {
@@ -1262,7 +1247,7 @@ document.addEventListener('pointerdown', _mousedown)
 
 time_of_press = 0
 function _handle_mouse_click(e) {
-    mouse.left = true
+    // mouse.left = true
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
     entity = entities[element_hit.entity_index]
     // print(element_hit, entity.on_click)
@@ -1292,65 +1277,66 @@ function _handle_mouse_click(e) {
     }
 }
 
-function _mouseup(event) {
-    mouse.click_end_position = mouse.position
-    if (time - time_of_press < .15) {
-        diff_x = mouse.position[0] - mouse.swipe_start_position[0]
-        diff_y = mouse.position[1] - mouse.swipe_start_position[1]
+document.addEventListener('mousedown', (event) => {
+    if (event.button == 0) {key = 'left mouse down'; mouse.left=true; held_keys['mouse left']=true}
+    else if (event.button == 1) {key = 'middle mouse down'; mouse.middle=true; held_keys['mouse middle']=true}
+    else if (event.button == 2) {key = 'right mouse down'; mouse.right=true; held_keys['mouse right']=true}
+    _update_mouse_position(event.clientX, event.clientY, event.pressure)
+    _handle_mouse_click(event)
+    _input(key)
 
-        if (diff_x < -.05 && abs(diff_y) < .15) {
-            _input('swipe left')
-        }
-        if (diff_x > .05 && abs(diff_y) < .15) {
-            _input('swipe right')
-        }
-        if (diff_y > .05 && abs(diff_x) < .15) {
-            _input('swipe up')
-        }
-        if (diff_y < -.05 && abs(diff_x) < .15) {
-            _input('swipe down')
-        }
-    }
-
-    _input(event)
-    mouse.left = false;
-    for (var e of entities) {
-        if (e.dragging) {
-            e.dragging = false
-            if (e.drop) {
-                e.drop()
-            }
-        }
-    }
-}
-document.addEventListener('pointerup', _mouseup)
+})
+document.addEventListener('touchstart', (event) => {
+    event = event.touches[0]
+    key = 'left mouse down'; mouse.left=true; held_keys['mouse left']=true
+    _update_mouse_position(event.clientX, event.clientY, event.pressure)
+    _handle_mouse_click(event)
+    _input(key)
+})
 
 
-function _update_mouse_position(event) {
+document.addEventListener('mouseup', (event) => {
+    if (     event.button == 0) {key = 'left mouse up';   mouse.left=false;   held_keys['mouse left']=false}
+    else if (event.button == 1) {key = 'middle mouse up'; mouse.middle=false; held_keys['mouse middle']=false}
+    else if (event.button == 2) {key = 'right mouse up';  mouse.right=false;  held_keys['mouse right']=false}
+    _input(key)
+})
+document.addEventListener('touchend', () => {
+    key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false
+    _input('left mouse up')
+})
+// document.addEventListener('touchcancel', (event) => {
+//     print(event)
+//     // event = event.touches[0]
+//     key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false
+//     _input('left mouse up')
+// })
+/* disable right click */
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+function _update_mouse_position(x, y, pressure) {
     window_position = _game_window.getBoundingClientRect()
-    event_x = event.clientX
-    event_y = event.clientY
-    mouse.x = (((event_x - window_position.left) / _game_window.clientWidth) - .5) * asp_x
-    mouse.y = -(((event_y - window_position.top) / _game_window.clientHeight ) - .5) / asp_y
+    mouse.x = (((x - window_position.left) / _game_window.clientWidth) - .5) * asp_x
+    mouse.y = -(((y - window_position.top) / _game_window.clientHeight ) - .5) / asp_y
     mouse.position = [mouse.x, mouse.y]
-    mouse.pressure = event.pressure * 2
+    mouse.pressure = pressure * 2
 }
 
-function _onmousemove(event) {
+function _onmousemove(pageX, pageY, clientX, clientY, pressure, target) {
     // print('move')
-    _update_mouse_position(event)
+    _update_mouse_position(clientX, clientY, pressure)
 
-    if (!mouse.hovered_entity) {
+    if (!mouse.hovered_entity || !target) {
         mouse.point = null
     }
     else {
-        var rect = event.target.getBoundingClientRect();
-        var x = event.clientX - rect.left; //x position within the element.
-        var y = event.clientY - rect.top;  //y position within the element.
+        var rect = target.getBoundingClientRect();
+        var x = clientX - rect.left; //x position within the element.
+        var y = clientY - rect.top;  //y position within the element.
         mouse.point = [(x/rect.width)-.5, .5-(y/rect.height)]
         // print(mouse.point)
     }
-    element_hit = document.elementFromPoint(event.pageX - window.pageXOffset, event.pageY - window.pageYOffset);
+    element_hit = document.elementFromPoint(pageX - window.scrollX, pageY - window.scrollY);
     _entity = entities[element_hit.entity_index]
     if (_entity) {
         mouse.hovered_entity = _entity
@@ -1384,7 +1370,15 @@ function _onmousemove(event) {
         }
     }
 }
-document.addEventListener('pointermove', _onmousemove)
+document.addEventListener('mousemove', (event) => {
+    _onmousemove(event.pageX, event.pageY, event.clientX, event.clientY, event.pressure, event.target)
+    
+})
+document.addEventListener('touchmove', (event) => {
+    event = event.touches[0]
+    _onmousemove(event.pageX, event.pageY, event.clientX, event.clientY, event.pressure, event.target)
+})
+
 
 mouse.update = () => {      // simulate pointermove. can for example be used to get an updated mouse.hovered_entity or mouse.point without having to wait a frame.
     var myEvent = new PointerEvent('pointermove')
@@ -1581,13 +1575,12 @@ function save_system_clear() {localStorage.clear()}
 
 time = 0
 delta_time = 1/60
-let start, _prev_time;
+let start, _prev_time
 update = null
 function _step(_timestamp) {
     if (start === undefined) {
         start = _timestamp;
     }
-    const elapsed = _timestamp - start;
     if (update) {
         update()
     }
@@ -1622,17 +1615,6 @@ function _input(event) {
             if (event.deltaY > 0) {key = 'scroll down'}
             else {key = 'scroll up'}
         }
-        else if (event.type == 'pointerdown') {
-            if (event.button == 0) {key = 'left mouse down'; mouse.left=true; held_keys['mouse left']=true}
-            else if (event.button == 1) {key = 'middle mouse down'; mouse.middle=true; held_keys['mouse middle']=true}
-            else if (event.button == 2) {key = 'right mouse down'; mouse.right=true; held_keys['mouse right']=true}
-        }
-        else if (event.type == 'pointerup') {
-            if (event.button == 0) {key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false}
-            else if (event.button == 1) {key = 'middle mouse up'; mouse.middle=false; held_keys['mouse middle']=false}
-            else if (event.button == 2) {key = 'right mouse up'; mouse.right=false; held_keys['mouse right']=false}
-        }
-
         else {
             key = event.key.toLowerCase()
         }
@@ -1655,7 +1637,18 @@ function _input(event) {
     else if (event.type == "keydown") {  // prevent key repeat
         return
     }
-
+    
+    if (key == 'left mouse up') {
+        // drop draggables
+        for (var e of entities) {
+            if (e.dragging) {
+                e.dragging = false
+                if (e.drop) {
+                    e.drop()
+                }
+            }
+        }
+    }
 
     for (var e of entities) {
         if (e.input && e.enabled) {
@@ -1664,6 +1657,28 @@ function _input(event) {
     }
     if (input) {
         input(key)
+    }
+
+    // swipe input 
+    if (key == 'left mouse up') {
+        mouse.click_end_position = mouse.position
+        if (time - time_of_press < .15) {
+            diff_x = mouse.position[0] - mouse.swipe_start_position[0]
+            diff_y = mouse.position[1] - mouse.swipe_start_position[1]
+    
+            if (diff_x < -.05 && abs(diff_y) < .15) {
+                _input('swipe left')
+            }
+            if (diff_x > .05 && abs(diff_y) < .15) {
+                _input('swipe right')
+            }
+            if (diff_y > .05 && abs(diff_x) < .15) {
+                _input('swipe up')
+            }
+            if (diff_y < -.05 && abs(diff_x) < .15) {
+                _input('swipe down')
+            }
+        }
     }
 }
 document.addEventListener('keydown', _input)
