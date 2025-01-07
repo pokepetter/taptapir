@@ -226,26 +226,27 @@ function rgb_to_hsv(_rgb_color) {
 }
 
 color = {
-  white:         hsv(0, 0, 1),
-  smoke:         hsv(0, 0, 0.96),
-  light_gray:    hsv(0, 0, 0.75),
-  gray:          hsv(0, 0, 0.5),
-  dark_gray:     hsv(0, 0, 0.25),
-  black:         hsv(0, 0, 0),
-  red:           hsv(0, 1, 1),
-  orange:        hsv(30, 1, 1),
-  yellow:        hsv(60, 1, 1),
-  lime:          hsv(90, 1, 1),
-  green:         hsv(120, 1, 1),
-  turquoise:     hsv(150, 1, 1),
-  cyan:          hsv(180, 1, 1),
-  azure:         hsv(210, 1, 1),
-  blue:          hsv(240, 1, 1),
-  violet:        hsv(270, 1, 1),
-  magenta:       hsv(300, 1, 1),
-  pink:          hsv(330, 1, 1),
-  clear:         [0, 0, 0, 0],
-  text_color:    hsv(0,0,.05),
+    white:         hsv(0, 0, 1),
+    smoke:         hsv(0, 0, 0.96),
+    light_gray:    hsv(0, 0, 0.75),
+    gray:          hsv(0, 0, 0.5),
+    dark_gray:     hsv(0, 0, 0.25),
+    black:         hsv(0, 0, 0),
+    red:           hsv(0, 1, 1),
+    orange:        hsv(30, 1, 1),
+    yellow:        hsv(60, 1, 1),
+    lime:          hsv(90, 1, 1),
+    green:         hsv(120, 1, 1),
+    turquoise:     hsv(150, 1, 1),
+    cyan:          hsv(180, 1, 1),
+    azure:         hsv(210, 1, 1),
+    blue:          hsv(240, 1, 1),
+    violet:        hsv(270, 1, 1),
+    magenta:       hsv(300, 1, 1),
+    pink:          hsv(330, 1, 1),
+    clear:         [0, 0, 0, 0],
+    text_color:    hsv(0,0,.05),
+    random_color:  function () {return rgb(Math.random(), Math.random(), Math.random())}
 }
 
 function set_window_color(value) {_game_window.style.backgroundColor = value}
@@ -557,7 +558,7 @@ class Entity {
                 this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}")`
             }
             else {
-                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random.int(0,999)}")`   // add random number so the gif restarts when setting .texture again
             }
             this.color = color.clear
             return
@@ -582,7 +583,7 @@ class Entity {
         }
 
         else if (name.endsWith('.gif')) {   // .gif (ensure animation replays on reuse)
-            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}?${random_int(0,999)}")`   // add random number so the gif restarts when setting .texture again
+            this.model.style.backgroundImage = `url("${ASSETS_FOLDER}${name}?${random.int(0,999)}")`   // add random number so the gif restarts when setting .texture again
             this.color = color.clear
             return
         }
@@ -858,28 +859,32 @@ function lerp_angle(start_angle, end_angle, t) {
 }
 
 function clamp(num, min, max) {
-  return num <= min ? min : num >= max ? max : num;
+    return num <= min ? min : num >= max ? max : num;
 }
-random_value = Math.random;
 
-function random_int(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function random_choice(list) {
-    return list[random_int(0, len(list)-1)]
-}
-function random_shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+random = {
+    value: Math.random,
+    random: Math.random,
+    int: function (min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    return array;
+    ,
+    choice: function (list) {
+        return list[random.int(0, len(list)-1)]
+    }
+    ,
+    shuffle: function (array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+        return array;
+    }
+    ,
 }
-function random_color() {
-    return rgb(Math.random(), Math.random(), Math.random())
-}
+
 
 function lists_are_equal(array_a, array_b) {
     for (let i=0; i<array_a.length; i++) {
@@ -966,8 +971,8 @@ class Camera {
 
             after(i*speed, () => {
                 this.xy = [
-                    original_xy[0] + (random_int(-1, 1)*.1 * magnitude * direction[0]),
-                    original_xy[1] + (random_int(-1, 1)*.1 * magnitude * direction[1])
+                    original_xy[0] + (random.int(-1, 1)*.1 * magnitude * direction[0]),
+                    original_xy[1] + (random.int(-1, 1)*.1 * magnitude * direction[1])
                 ]
             })
             after(duration, () => {

@@ -128,7 +128,7 @@ math
 ```
 lerp()
 clamp()
-random_int()
-random_choice()
+random.int()
+random.choice()
 lists_are_equal()
 ```
