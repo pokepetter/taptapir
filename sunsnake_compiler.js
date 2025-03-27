@@ -26,6 +26,7 @@ function compile(script) {
     script = script.replaceAll('.index(', '.indexOf(')
     script = script.replaceAll(' self.', ' this.')
     script = script.replaceAll('(self.', '(this.')
+    script = script.replaceAll('def __init__(self, ', 'constructor(')
     // script = script.replaceAll('(self.', '(this.')
 
     var all_lines = script.split('\n')
@@ -108,7 +109,7 @@ function compile(script) {
         }
 
         if (all_lines[i].startsWith('class ')) {
-          class_name = all_lines[i].slice(6).split(' ')[0]
+          class_name = all_lines[i].slice(6).split(' ')[0].split('(')[0].split(':')[0]
           print('found class:', class_name)
             _class_names.push(class_name)
         }

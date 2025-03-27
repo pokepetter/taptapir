@@ -1,4 +1,3 @@
-// aspect_ratio = 16/9
 scale = 1
 print = console.log
 
@@ -85,56 +84,66 @@ scene._children = []
 _game_window.appendChild(scene)
 
 // print('browser aspect_ratio:', browser_aspect_ratio)
-format = null
 is_mobile = 'ontouchstart' in document.documentElement
 fullscreen = false
 camera = null
+ASPECT_RATIO = 9/16
 
 function set_orientation(value) {
+    if (value == 'vertical') {
+        aspect_ratio = 9/16
+    }
+    if (value == 'horizontal') {
+        aspect_ratio = 16/9
+    }
+    set_aspect_ratio(aspect_ratio)
+}
+
+// set_orientation
+function set_aspect_ratio(aspect_ratio) {
+    ASPECT_RATIO = aspect_ratio
+    print('set aspect ratio to:', aspect_ratio)
     var width = window.innerWidth
     var height = window.innerHeight
     browser_aspect_ratio = width / height
     // print('width:', width, 'height:', height, 'browser_aspect_ratio:', browser_aspect_ratio)
-
-    format = value
-    if (format == 'vertical') {
-        aspect_ratio = 16/9
+    if (aspect_ratio < 1) {
         // used for setting correct draggable limits
         asp_x = 1
-        asp_y = 9/16
+        asp_y = aspect_ratio
 
-        if (browser_aspect_ratio >= 9/16) { // if the screen is wider than the game, like a pc monitor.
-            // print('vertical view desktop')
-            _game_window.style.width = `${width*scale/browser_aspect_ratio/(16/9)}px`
+        if (browser_aspect_ratio < aspect_ratio) { // if the screen is wider than the game, like a pc monitor.
+            print('vertical view desktop')
+            _game_window.style.width = `${width*scale/browser_aspect_ratio*aspect_ratio}px`
             _game_window.style.height =  `${height*scale}px`
         }
         else {                              // if the screen is taller than the game, like a phone screen.
-            // print('vertical view mobile')
-            _game_window.style.height = `${width*scale*(16/9)}px`
-            _game_window.style.width =  `${width*scale}px`
+            print('vertical view mobile', width, width/aspect_ratio, height)
+            _game_window.style.height = `${height*scale}px`
+            _game_window.style.width =  `${height*scale*aspect_ratio}px`
         }
-        if (camera) {camera.ui.scale = [1, 1/aspect_ratio]}
-        top_left =      [-.5, .5*aspect_ratio]
-        top_right =     [.5, .5*aspect_ratio]
-        bottom_left =   [-.5, -.5*aspect_ratio]
-        bottom_right =  [.5, -.5*aspect_ratio]
-        top =           [0, .5*aspect_ratio]
-        bottom =        [0, -.5*aspect_ratio]
+        if (camera) {camera.ui.scale = [1, 1*aspect_ratio]}
+        top_left =      [-.5, .5/aspect_ratio]
+        top_right =     [.5, .5/aspect_ratio]
+        bottom_left =   [-.5, -.5/aspect_ratio]
+        bottom_right =  [.5, -.5/aspect_ratio]
+        top =           [0, .5/aspect_ratio]
+        bottom =        [0, -.5/aspect_ratio]
         left =          [-.5, 0]
         right =         [.5, 0]
     }
     else {
-        aspect_ratio = 16/9
-        asp_x = 16/9
+        // aspect_ratio = 16/9
+        asp_x = aspect_ratio
         asp_y = 1
         scene.style.width = `${1/asp_x*100}%`
         scene.style.height = `${1/asp_y*100}%`
-        if (browser_aspect_ratio > 16/9) { // if the screen is wider than 16/9, fit to height
+        if (browser_aspect_ratio > aspect_ratio) { // if the screen is wider than 16/9, fit to height
             _game_window.style.height = `${height*scale}px`
-            _game_window.style.width =  `${width*scale/browser_aspect_ratio*16/9}px`
+            _game_window.style.width =  `${width*scale/browser_aspect_ratio*aspect_ratio}px`
         }
         else {                              // if the screen is taller than 16/9, fit to width
-            _game_window.style.height = `${height*scale*browser_aspect_ratio/(16/9)}px`
+            _game_window.style.height = `${height*scale*browser_aspect_ratio/aspect_ratio}px`
             _game_window.style.width =  `${width*scale}px`
         }
         if (camera) {camera.ui.scale = [1/aspect_ratio, 1]}
@@ -253,7 +262,8 @@ function set_window_color(value) {_game_window.style.backgroundColor = value}
 function set_background_color(value) {document.body.style.backgroundColor = value}
 function set_scale(value) {
     scale = value
-    set_orientation(format)
+    // set_orientation(format)
+    set_aspect_ratio(ASPECT_RATIO)
 }
 
 function set_fullscreen(value) {
@@ -299,7 +309,7 @@ LAST_SCENE = null
 DEFAULT_FONT = null
 TEXT_SIZE_MULTIPLIER = 1
 
-class Entity {    
+class Entity {
     constructor(options=null) {
         if (!('type' in options)) {
             options['type'] = 'entity'
@@ -444,7 +454,7 @@ class Entity {
         else {
             this.el.style.visibility = 'hidden'
         }
- 
+
         this._enabled = value
 
         if (value && this.on_enable) {
@@ -666,7 +676,7 @@ class Entity {
     get text_size() {return this._text_size}
     set text_size(value) {
         this._text_size = value
-        if (format == 'vertical') {
+        if (aspect_ratio < 1) {
             this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vh`
         }
         else {
@@ -776,7 +786,7 @@ class Entity {
                         }
                         else {
                             // fallback to linear
-                            // entity[variable_name] = lerp(start_value, target_value, t)                            
+                            // entity[variable_name] = lerp(start_value, target_value, t)
                         }
                     },
                     1000*i/60
@@ -824,6 +834,9 @@ class Entity {
     look_at(target_pos) {
         this.rotation = -(Math.atan2(target_pos[1] - this.y, target_pos[0] - this.x)) * (180/Math.PI)
     }
+    look_in_direction(direction) {
+        this.rotation = -(Math.atan2(direction[1], direction[0])) * (180/Math.PI)
+    }
 
     destroy_children() {
         for (let _entity of this.children) {
@@ -842,7 +855,7 @@ class Entity {
 async function check_image(url){
     const res = await fetch(url);
     const buff = await res.blob();
-   
+
     return buff.type.startsWith('image/')
 }
 
@@ -912,7 +925,7 @@ class Camera {
     get x() {return this._x}
     set x(value) {
         this._x = value
-        if (format == 'vertical') {
+        if (aspect_ratio < 1) {
             scene.style.left = `${50+(-value*100/this.fov)}%`
         }
         else {
@@ -922,7 +935,7 @@ class Camera {
     get y() {return this._y}
     set y(value) {
         this._y = value
-        if (format == 'vertical') {
+        if (aspect_ratio < 1) {
             scene.style.top = `${50+(value*100*asp_y/this.fov)}%`
         }
         else {
@@ -955,7 +968,7 @@ class Camera {
         this._fov = value
         scene.style.width = `${1/value*100/asp_x}%`
 
-        if (format == 'vertical') {
+        if (aspect_ratio < 1) {
             scene.style.height = `${1/value*100/asp_x*asp_y}%`
         }
         else {
@@ -978,7 +991,7 @@ class Camera {
             after(duration, () => {
                 this.xy = original_xy
             })
-            
+
         }
     }
 }
@@ -1018,11 +1031,11 @@ function Scene(input) {
     settings = {parent:scene, visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null}
     _bg_color = input.color
     input.color = null
-    
+
     for (const [key, value] of Object.entries(input)) {
         settings[key] = value
     }
-    
+
     _entity = new Entity(settings)
 
     if (input.texture || _bg_color) {
@@ -1377,7 +1390,7 @@ function _onmousemove(pageX, pageY, clientX, clientY, pressure, target) {
 }
 document.addEventListener('mousemove', (event) => {
     _onmousemove(event.pageX, event.pageY, event.clientX, event.clientY, event.pressure, event.target)
-    
+
 })
 document.addEventListener('touchmove', (event) => {
     event = event.touches[0]
@@ -1432,7 +1445,7 @@ function Video(options) {
     _entity = new Entity(settings)
     // let name = settings['name']
 
-    let video_entity = new Entity(settings) 
+    let video_entity = new Entity(settings)
     video_entity.video = document.createElement('video')
     video_entity.video.src = settings['name']
     video_entity.video.controls = false
@@ -1532,7 +1545,7 @@ function sample(population, k){
 
     return result;
     }
-    
+
 function grid_layout(l, options) {
     let settings = {spacing:[1.1,1.1], offset:[0,0], max_x:16}
     for (const [key, value] of Object.entries(options)) {
@@ -1642,7 +1655,7 @@ function _input(event) {
     else if (event.type == "keydown") {  // prevent key repeat
         return
     }
-    
+
     if (key == 'left mouse up') {
         // drop draggables
         for (var e of entities) {
@@ -1664,13 +1677,13 @@ function _input(event) {
         input(key)
     }
 
-    // swipe input 
+    // swipe input
     if (key == 'left mouse up') {
         mouse.click_end_position = mouse.position
         if (time - time_of_press < .15) {
             diff_x = mouse.position[0] - mouse.swipe_start_position[0]
             diff_y = mouse.position[1] - mouse.swipe_start_position[1]
-    
+
             if (diff_x < -.05 && abs(diff_y) < .15) {
                 _input('swipe left')
             }
@@ -1714,3 +1727,6 @@ function _fullscreenchange() {
 document.addEventListener('fullscreenchange', _fullscreenchange)
 
 set_orientation('vertical')
+// set_orientation('horizontal')
+// set_aspect_ratio(.5)
+set_scale(.95)
