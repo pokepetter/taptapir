@@ -909,6 +909,9 @@ random = {
 
 
 function lists_are_equal(array_a, array_b) {
+    if (array_a.length != array_b.length) {
+        return false
+    }
     for (let i=0; i<array_a.length; i++) {
         if (array_a[i] != array_b[i]) {
             return false
