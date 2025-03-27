@@ -40,7 +40,7 @@ function compile(script) {
 
     extra_replacements = []
     is_in_multiline_string = false
-    
+
     prev_created_variable = null    // for storing the recently defined variable starting with $, so it can be references with '_.'
 
     for (var i=0; i<all_lines.length; i++) {
@@ -307,7 +307,7 @@ function compile(script) {
             }
         }
 
-        
+
         // units
         for (var n=0; n<10; n++) {
             lines[i] = lines[i].replaceAll(`${n}ms`, `${n}*.001`)
@@ -524,6 +524,15 @@ class Array2D {
     }
 }
 
+function* enumerate_2d(target_2d_list) {
+    for (let x = 0; x < target_2d_list.length; x++) {
+        let line = target_2d_list[x];
+        for (let y = 0; y < line.length; y++) {
+            yield [[x, y], line[y]];
+        }
+    }
+}
+
 
 function Array_3d(w, h, d) {
     var arr = new Array(w);
@@ -574,6 +583,9 @@ Array.prototype.remove = function (element) {
 }
 Array.prototype.remove_at = function (index) {
     this.splice(index, 1)
+}
+Array.prototype.extend = function (items) {
+    this.push(...items)
 }
 
 Array.prototype.skip = function (n) {

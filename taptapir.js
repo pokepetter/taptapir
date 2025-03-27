@@ -91,70 +91,71 @@ ASPECT_RATIO = 9/16
 
 function set_orientation(value) {
     if (value == 'vertical') {
-        aspect_ratio = 9/16
+        ASPECT_RATIO = 9/16
     }
     if (value == 'horizontal') {
-        aspect_ratio = 16/9
+        ASPECT_RATIO = 16/9
     }
-    set_aspect_ratio(aspect_ratio)
+    set_aspect_ratio(ASPECT_RATIO)
 }
 
 // set_orientation
-function set_aspect_ratio(aspect_ratio) {
-    ASPECT_RATIO = aspect_ratio
-    print('set aspect ratio to:', aspect_ratio)
+function set_aspect_ratio(_aspect_ratio) {
+    ASPECT_RATIO = _aspect_ratio
+    print('set aspect ratio to:', _aspect_ratio)
     var width = window.innerWidth
     var height = window.innerHeight
     browser_aspect_ratio = width / height
     // print('width:', width, 'height:', height, 'browser_aspect_ratio:', browser_aspect_ratio)
-    if (aspect_ratio < 1) {
+    if (ASPECT_RATIO < 1) { // vertical
         // used for setting correct draggable limits
         asp_x = 1
-        asp_y = aspect_ratio
+        asp_y = ASPECT_RATIO
+        aspect_ratio = 1/ASPECT_RATIO
 
-        if (browser_aspect_ratio < aspect_ratio) { // if the screen is wider than the game, like a pc monitor.
+        if (browser_aspect_ratio < ASPECT_RATIO) { // if the screen is wider than the game, like a pc monitor.
             print('vertical view desktop')
-            _game_window.style.width = `${width*scale/browser_aspect_ratio*aspect_ratio}px`
+            _game_window.style.width = `${width*scale/browser_aspect_ratio*ASPECT_RATIO}px`
             _game_window.style.height =  `${height*scale}px`
         }
         else {                              // if the screen is taller than the game, like a phone screen.
-            print('vertical view mobile', width, width/aspect_ratio, height)
+            print('vertical view mobile', width, width/ASPECT_RATIO, height)
             _game_window.style.height = `${height*scale}px`
-            _game_window.style.width =  `${height*scale*aspect_ratio}px`
+            _game_window.style.width =  `${height*scale*ASPECT_RATIO}px`
         }
-        if (camera) {camera.ui.scale = [1, 1*aspect_ratio]}
-        top_left =      [-.5, .5/aspect_ratio]
-        top_right =     [.5, .5/aspect_ratio]
-        bottom_left =   [-.5, -.5/aspect_ratio]
-        bottom_right =  [.5, -.5/aspect_ratio]
-        top =           [0, .5/aspect_ratio]
-        bottom =        [0, -.5/aspect_ratio]
+        if (camera) {camera.ui.scale = [1, 1*ASPECT_RATIO]}
+        top_left =      [-.5, .5/ASPECT_RATIO]
+        top_right =     [.5, .5/ASPECT_RATIO]
+        bottom_left =   [-.5, -.5/ASPECT_RATIO]
+        bottom_right =  [.5, -.5/ASPECT_RATIO]
+        top =           [0, .5/ASPECT_RATIO]
+        bottom =        [0, -.5/ASPECT_RATIO]
         left =          [-.5, 0]
         right =         [.5, 0]
     }
     else {
-        // aspect_ratio = 16/9
-        asp_x = aspect_ratio
+        asp_x = ASPECT_RATIO
         asp_y = 1
+        aspect_ratio = asp_x
         scene.style.width = `${1/asp_x*100}%`
         scene.style.height = `${1/asp_y*100}%`
-        if (browser_aspect_ratio > aspect_ratio) { // if the screen is wider than 16/9, fit to height
+        if (browser_aspect_ratio > ASPECT_RATIO) { // if the screen is wider than 16/9, fit to height
             _game_window.style.height = `${height*scale}px`
-            _game_window.style.width =  `${width*scale/browser_aspect_ratio*aspect_ratio}px`
+            _game_window.style.width =  `${width*scale/browser_aspect_ratio*ASPECT_RATIO}px`
         }
         else {                              // if the screen is taller than 16/9, fit to width
-            _game_window.style.height = `${height*scale*browser_aspect_ratio/aspect_ratio}px`
+            _game_window.style.height = `${height*scale*browser_aspect_ratio/ASPECT_RATIO}px`
             _game_window.style.width =  `${width*scale}px`
         }
-        if (camera) {camera.ui.scale = [1/aspect_ratio, 1]}
-        top_left =      [-.5*aspect_ratio, .5]
-        top_right =     [.5*aspect_ratio, .5]
-        bottom_left =   [-.5*aspect_ratio, -.5]
-        bottom_right =  [.5*aspect_ratio, -.5]
+        if (camera) {camera.ui.scale = [1/ASPECT_RATIO, 1]}
+        top_left =      [-.5*ASPECT_RATIO, .5]
+        top_right =     [.5*ASPECT_RATIO, .5]
+        bottom_left =   [-.5*ASPECT_RATIO, -.5]
+        bottom_right =  [.5*ASPECT_RATIO, -.5]
         top =           [0, .5]
         bottom =        [0, -.5]
-        left =          [-.5*aspect_ratio, 0]
-        right =         [.5*aspect_ratio, 0]
+        left =          [-.5*ASPECT_RATIO, 0]
+        right =         [.5*ASPECT_RATIO, 0]
 
     }
 }
@@ -676,7 +677,7 @@ class Entity {
     get text_size() {return this._text_size}
     set text_size(value) {
         this._text_size = value
-        if (aspect_ratio < 1) {
+        if (ASPECT_RATIO < 1) {
             this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vh`
         }
         else {
@@ -777,11 +778,19 @@ class Entity {
                             return false}
                         var t = i / duration / 60
                         if (typeof curve === 'function') {
-                            if (variable_name != 'rotation') {
+                            if (variable_name != 'rotation' && variable_name != 'color') {
                                 entity[variable_name] = lerp(start_value, target_value, curve(t))
                             }
-                            else {
+                            else if (variable_name == 'rotation') {
                                 entity[variable_name] = lerp_angle(start_value, target_value, curve(t))
+                            }
+                            else if (variable_name == 'color') {
+                                entity[variable_name] = [
+                                    lerp(entity.color[0], target_value[0], curve(t)),
+                                    lerp(entity.color[1], target_value[1], curve(t)),
+                                    lerp(entity.color[2], target_value[2], curve(t)),
+                                    lerp(entity.color[3], target_value[3], curve(t))
+                                ]
                             }
                         }
                         else {
@@ -925,7 +934,7 @@ class Camera {
     get x() {return this._x}
     set x(value) {
         this._x = value
-        if (aspect_ratio < 1) {
+        if (ASPECT_RATIO < 1) {
             scene.style.left = `${50+(-value*100/this.fov)}%`
         }
         else {
@@ -935,7 +944,7 @@ class Camera {
     get y() {return this._y}
     set y(value) {
         this._y = value
-        if (aspect_ratio < 1) {
+        if (ASPECT_RATIO < 1) {
             scene.style.top = `${50+(value*100*asp_y/this.fov)}%`
         }
         else {
@@ -968,7 +977,7 @@ class Camera {
         this._fov = value
         scene.style.width = `${1/value*100/asp_x}%`
 
-        if (aspect_ratio < 1) {
+        if (ASPECT_RATIO < 1) {
             scene.style.height = `${1/value*100/asp_x*asp_y}%`
         }
         else {
