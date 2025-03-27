@@ -1266,11 +1266,11 @@ mouse = {x:0, y:0, position:[0,0], left:false, middle:false, pressure:0.0, hover
     }
 }
 
-
-// const click_animation = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'texture':'impact_effect.gif', 'enabled':false, 'alpha':.5})
-// if (!click_animation.texture) {
-//     click_animation.visible = false
-// }
+mouse.click_animation = ''
+mouse.click_animation_entity = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'enabled':false, 'alpha':.5})
+if (!mouse.click_animation) {
+    mouse.click_animation_entity.visible = false
+}
 
 time_of_press = 0
 function _handle_mouse_click(e) {
@@ -1287,11 +1287,12 @@ function _handle_mouse_click(e) {
     if (element_hit && entity) {
         if (entity.on_click) {
             entity.on_click()
-            // if (click_animation.texture) {
-            //     click_animation.xy = mouse.position
-            //     click_animation.enabled = True
-            //     click_animation.texture = 'impact_effect.gif'
-            // }
+            if (mouse.click_animation) {
+                mouse.click_animation_entity.xy = mouse.position
+                mouse.click_animation_entity.enabled = True
+                mouse.click_animation_entity.texture = mouse.click_animation
+                print('play click anim')
+            }
         }
         if (entity.draggable) {
             window_position = _game_window.getBoundingClientRect()
