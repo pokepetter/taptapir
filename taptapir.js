@@ -96,6 +96,11 @@ function set_orientation(value) {
     if (value == 'horizontal') {
         ASPECT_RATIO = 16/9
     }
+    if (value == 'auto') {
+        var width = window.innerWidth
+        var height = window.innerHeight
+        ASPECT_RATIO = width / height
+    }
     set_aspect_ratio(ASPECT_RATIO)
 }
 
@@ -304,7 +309,7 @@ curves = {
 
 ASSETS_FOLDER = ''
 TAPTAPIR_TEXTURES = {}
-entities = []
+ENTITIES = []
 AUTOPARENT_TO_SCENE = true
 LAST_SCENE = null
 DEFAULT_FONT = null
@@ -321,7 +326,7 @@ class Entity {
         }
         if (!this.add_to_scene) {
             this.el = document.createElement(options['type'])
-            entities.push(this)
+            ENTITIES.push(this)
             for (const [key, value] of Object.entries(options)) {
                 this[key] = value
             }
@@ -343,13 +348,13 @@ class Entity {
         this.el.style.backgroundColor = 'rgba(0,0,0,0)'
         // this.el.style.pointerEvents = 'none'
         this.model = document.createElement(options['type'])
-        this.model.entity_index = entities.length
+        this.model.entity_index = ENTITIES.length
         this.model.id = 'model'
         this.el.appendChild(this.model)
 
         this.model.className = options['type']
         this.model.style.opacity = 1
-        entities.push(this)
+        ENTITIES.push(this)
 
         this.setTimeout_calls = {}
         if (!('render' in options) || options['render']) {
@@ -1096,13 +1101,14 @@ class StateHandler {
         else {
             this.hard_state = value
         }
+        this._state = value
     }
     set hard_state(value) {     // set the state without fading
         // print('set state to:', value)
         if (this._state === value) {
             return
         }
-        for (let entity of this.states) {
+        for (let entity of this.states.values()) {
             if (value === entity || value === entity.name) {
                 entity.enabled = true
                 if (entity.on_enter) {
@@ -1279,7 +1285,7 @@ time_of_press = 0
 function _handle_mouse_click(e) {
     // mouse.left = true
     element_hit = document.elementFromPoint(e.pageX - window.pageXOffset, e.pageY - window.pageYOffset);
-    entity = entities[element_hit.entity_index]
+    entity = ENTITIES[element_hit.entity_index]
     // print(element_hit, entity.on_click)
     if (!element_hit || entity === undefined || entity.on_click === undefined) {
         mouse.swipe_start_position = mouse.position
@@ -1368,14 +1374,14 @@ function _onmousemove(pageX, pageY, clientX, clientY, pressure, target) {
         // print(mouse.point)
     }
     element_hit = document.elementFromPoint(pageX - window.scrollX, pageY - window.scrollY);
-    _entity = entities[element_hit.entity_index]
+    _entity = ENTITIES[element_hit.entity_index]
     if (_entity) {
         mouse.hovered_entity = _entity
     }
     else {
         mouse.hovered_entity = null
     }
-    for (var e of entities) {
+    for (var e of ENTITIES) {
         if (e.dragging) {
             if (!e.lock_x) {
                 // print(mouse.x, e.start_offset[0])
@@ -1616,7 +1622,7 @@ function _step(_timestamp) {
         update()
     }
 
-    for (var e of entities) {
+    for (var e of ENTITIES) {
         if (e.update && e.enabled) {
             e.update()
         }
@@ -1671,7 +1677,7 @@ function _input(event) {
 
     if (key == 'left mouse up') {
         // drop draggables
-        for (var e of entities) {
+        for (var e of ENTITIES) {
             if (e.dragging) {
                 e.dragging = false
                 if (e.drop) {
@@ -1681,7 +1687,7 @@ function _input(event) {
         }
     }
 
-    for (var e of entities) {
+    for (var e of ENTITIES) {
         if (e.input && e.enabled) {
             e.input(key)
         }
