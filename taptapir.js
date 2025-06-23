@@ -180,14 +180,18 @@ function rgb(r, g, b) {return [parseInt(r*255), parseInt(g*255), parseInt(b*255)
 function rgb32(r, g, b) {return [r,g,b]}
 
 function hex_to_rgb(value) {
-    if (value.length === 4) {
+    if (value.length === 1+3) {
         value = `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`   // convert '#333' to '#333333'
+    }
+    if (value.length === 1+6) {
+        value += 'ff'   // add alpha part
     }
     try {
         r = value.slice(1,3)
         g = value.slice(3,5)
         b = value.slice(5,7)
-        return [parseInt(r,16), parseInt(g,16), parseInt(b,16)]
+        a = value.slice(7,9)
+        return [parseInt(r,16), parseInt(g,16), parseInt(b,16), parseInt(a,16)]
     }
     catch (e) {
         console.error('invalid hex code:', value);
@@ -499,9 +503,9 @@ class Entity {
         if (value.length == 3) {
             value = [value[0], value[1], value[2], 255]
         }
-        // print('set color:', value)
+        // print('set color:', value, `rgba(${value[0]},${value[1]},${value[2]},${value[3]})`)
         this._color = value
-        this.model.style.backgroundColor = `rgba(${value[0]},${value[1]},${value[2]},${value[3]})`
+        this.model.style.backgroundColor = `rgba(${value[0]},${value[1]},${value[2]},${value[3]/255})`
     }
     get scale_x() {return this._scale_x}
     set scale_x(value) {
@@ -1300,8 +1304,19 @@ function _handle_mouse_click(e) {
                 mouse.click_animation_entity.xy = mouse.position
                 mouse.click_animation_entity.enabled = True
                 mouse.click_animation_entity.texture = mouse.click_animation
+                entity.model.style.backgroundColor = `rgba(${value[0]},${value[1]},${value[2]},${value[3]/255})`
+
+
                 print('play click anim')
             }
+            const originalColor = entity.color
+            print(originalColor)
+            let resetTimeout;
+            clearTimeout(resetTimeout);
+            entity.color = color.azure
+            resetTimeout = setTimeout(() => {
+                entity.model.style.backgroundColor = originalColor;
+                }, 200);
         }
         if (entity.draggable) {
             window_position = _game_window.getBoundingClientRect()
@@ -1568,7 +1583,7 @@ function sample(population, k){
 function grid_layout(l, options) {
     let settings = {spacing:[1.1,1.1], offset:[0,0], max_x:16}
     for (const [key, value] of Object.entries(options)) {
-        print('setting', key, 'to', value)
+        // print('setting', key, 'to', value)
         settings[key] = value
     }
     spacing = settings['spacing']
