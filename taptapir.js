@@ -1304,19 +1304,8 @@ function _handle_mouse_click(e) {
                 mouse.click_animation_entity.xy = mouse.position
                 mouse.click_animation_entity.enabled = True
                 mouse.click_animation_entity.texture = mouse.click_animation
-                entity.model.style.backgroundColor = `rgba(${value[0]},${value[1]},${value[2]},${value[3]/255})`
-
-
                 print('play click anim')
             }
-            const originalColor = entity.color
-            print(originalColor)
-            let resetTimeout;
-            clearTimeout(resetTimeout);
-            entity.color = color.azure
-            resetTimeout = setTimeout(() => {
-                entity.model.style.backgroundColor = originalColor;
-                }, 200);
         }
         if (entity.draggable) {
             window_position = _game_window.getBoundingClientRect()
