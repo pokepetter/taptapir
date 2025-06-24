@@ -117,16 +117,16 @@ function set_aspect_ratio(_aspect_ratio) {
         asp_x = 1
         asp_y = ASPECT_RATIO
         aspect_ratio = 1/ASPECT_RATIO
-
-        if (browser_aspect_ratio < ASPECT_RATIO) { // if the screen is wider than the game, like a pc monitor.
-            print('vertical view desktop')
+        print(browser_aspect_ratio, aspect_ratio)
+        if (browser_aspect_ratio > ASPECT_RATIO) { // if the screen is wider than the game, like a pc monitor.
+            print('vertical view on wide screen (probably pc)')
             _game_window.style.width = `${width*scale/browser_aspect_ratio*ASPECT_RATIO}px`
             _game_window.style.height =  `${height*scale}px`
         }
         else {                              // if the screen is taller than the game, like a phone screen.
-            print('vertical view mobile', width, width/ASPECT_RATIO, height)
-            _game_window.style.height = `${height*scale}px`
-            _game_window.style.width =  `${height*scale*ASPECT_RATIO}px`
+            print('vertical view on talls screen (probably mobile)', width, width/ASPECT_RATIO, height)
+            _game_window.style.height = `${width/ASPECT_RATIO*scale}px`
+            _game_window.style.width =  `${width*scale}px`
         }
         if (camera) {camera.ui.scale = [1, 1*ASPECT_RATIO]}
         top_left =      [-.5, .5/ASPECT_RATIO]
@@ -1752,4 +1752,4 @@ document.addEventListener('fullscreenchange', _fullscreenchange)
 set_orientation('vertical')
 // set_orientation('horizontal')
 // set_aspect_ratio(.5)
-set_scale(.95)
+// set_scale(.95)
