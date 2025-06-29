@@ -1224,12 +1224,17 @@ class RainbowSlider extends Entity {
 
 class InputField extends Entity {
     constructor(options=false) {
-        let settings = {roundness:.5, color:color.smoke, text_size:2, value:''}
+        let settings = {roundness:.5, color:color.smoke, text_size:2, value:'', num_lines:1}
         for (const [key, value] of Object.entries(options)) {
             settings[key] = value
         }
         super(settings)
-        this.input_field = document.createElement('input')
+        if (settings['num_lines'] == 1) {
+            this.input_field = document.createElement('input')
+        }
+        else {
+            this.input_field = document.createElement('textarea')
+        }
         this.model.appendChild(this.input_field)
         this.input_field.onkeyup = () => {
             if (this.on_value_changed) {
