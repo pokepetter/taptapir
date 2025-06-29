@@ -605,8 +605,11 @@ Object.prototype.values = function() {
     return Object.values(this)
 }
 Object.prototype.includes = function(key) { // to allow for if name in dict, instad of having to do if name in dict.keys()
-    return Object.keys(this).includes(key);
-};
+    return Object.keys(this).includes(key)
+}
+Object.prototype.equals = function(other) {
+    return JSON.stringify(this) == JSON.stringify(other)
+}
 
 function tuple(arr) {
     return arr
