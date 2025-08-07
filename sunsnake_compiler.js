@@ -456,6 +456,7 @@ sqrt = Math.sqrt
 sin = Math.sin
 pow = Math.pow
 math.pi = Math.PI
+String.prototype.startswith = String.prototype.startsWith
 
 function round(value, digits=0) {
     return Number(Math.round(value+'e'+digits)+'e-'+digits);
