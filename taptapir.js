@@ -65,6 +65,9 @@ input, textarea {
   resize: none;
   color: inherit;
 }
+a {
+    pointer-events: auto;
+}
 `
 document.head.append(style)
 
