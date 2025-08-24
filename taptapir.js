@@ -1736,6 +1736,19 @@ function _input(event) {
             }
         }
     }
+
+}
+
+// debugging tool to show name of entity
+_entity_finder = new Entity({scale:[.45,.05], color:color.azure, y:-.5, z:-100, origin:[0,-.5], text:'entity_finder', text_origin:[0,0], roundess:.25, text_color:color.white, visible_self:false})
+_entity_finder.input = function _(key) {
+    if (held_keys['control'] && key === 'left mouse down' && mouse.hovered_entity) {
+        _entity_finder.visible_self = true
+        _entity_finder.text = mouse.hovered_entity.name
+    }
+    else if (key === 'left mouse up') {
+        _entity_finder.visible_self = false
+    }
 }
 document.addEventListener('keydown', _input)
 document.addEventListener('keyup', _input)
