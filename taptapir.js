@@ -388,6 +388,7 @@ class Entity {
         this.y = 0
         this.z = 0
         this.scale = [1,1]
+        this.origin = [0,0]
         this.rotation = 0
         this.draggable = false
         this.dragging = false
@@ -526,6 +527,12 @@ class Entity {
         this.scale_x = value[0]
         this.scale_y = value[1]
     }
+    get model_scale() {return this._model_scale}
+    set model_scale(value) {
+        this._model_scale = value
+        this.update_model_transform()
+    }
+
     get x() {return this._x}
     set x(value) {
         this.el.style.left = `${50+(value*100)}%`
@@ -562,6 +569,11 @@ class Entity {
     set origin(value) {
         this.model.style.transform = `translate(${(-value[0]-.5)*100}%, ${(value[1]-.5)*100}%)`
         this._origin = value
+        this.update_model_transform()
+    }
+
+    update_model_transform() {
+        this.model.style.transform = `translate(${(-this._origin[0]-.5)*100}%, ${(this._origin[1]-.5)*100}%) scale(${this._model_scale})`
     }
     get rotation() {return this._rotation}
     set rotation(value) {
@@ -1314,6 +1326,8 @@ function _handle_mouse_click(e) {
                 mouse.click_animation_entity.texture = mouse.click_animation
                 print('play click anim')
             }
+            entity.model_scale = .98
+            after(.05, () => {entity.model_scale = 1})
         }
         if (entity.draggable) {
             window_position = _game_window.getBoundingClientRect()
