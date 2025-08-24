@@ -1350,18 +1350,25 @@ document.addEventListener('mouseup', (event) => {
     else if (event.button == 2) {key = 'right mouse up';  mouse.right=false;  held_keys['mouse right']=false}
     _input(key)
 })
-document.addEventListener('touchend', () => {
-    key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false
+document.addEventListener('touchend', (event) => {
+    event.preventDefault(); // prevent synthetic mouse events
+    key = 'left mouse up'
+    mouse.left=false
+    held_keys['mouse left'] = false
     _input('left mouse up')
-})
+}, { passive: false })
 // document.addEventListener('touchcancel', (event) => {
 //     print(event)
 //     // event = event.touches[0]
 //     key = 'left mouse up'; mouse.left=false; held_keys['mouse left']=false
 //     _input('left mouse up')
 // })
-/* disable right click */
-document.addEventListener('contextmenu', event => event.preventDefault());
+/* disable right click unless Ctrl is held */
+document.addEventListener('contextmenu', event => {
+    if (!event.ctrlKey) {
+      event.preventDefault();
+    }
+  });
 
 function _update_mouse_position(x, y, pressure) {
     window_position = _game_window.getBoundingClientRect()
