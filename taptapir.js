@@ -324,7 +324,10 @@ TEXT_SIZE_MULTIPLIER = 1
 
 class Entity {
     constructor(options=null) {
-        if (!('type' in options)) {
+        if (options === null) {
+            options = {}
+        }
+        if (options && !('type' in options)) {
             options['type'] = 'entity'
         }
         this.add_to_scene = true
