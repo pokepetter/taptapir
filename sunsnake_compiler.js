@@ -16,18 +16,40 @@ catch {String.prototype.replaceAll = function replaceAll(search, replace) { retu
 function compile(script) {
     try {t = performance.now()} catch {}
     // start parsing
-    script = script.replaceAll(',\n', ',')
-    script = script.replaceAll('(\n', '(')
-    script = script.replaceAll('{\n', '{')
-    script = script.replaceAll('[\n', '[')
-    script = script.replaceAll('=\n', '=')
-    script = script.replaceAll('+\n', '+')
+
+    // remove comments that are not in strings
+    is_in_multiline_string = false
+    lines = script.split('\n')
+    lines_without_comments = []
+    for (var i=0; i<lines.length; i++) {
+        // multiline string wrappend in triple backticks```
+        if (!is_in_multiline_string && lines[i].trimEnd().endsWith('```') && lines[i].trim() != '```') {    // start
+            is_in_multiline_string = true
+        }
+        else if (is_in_multiline_string && lines[i].includes('```')) {   // end
+            is_in_multiline_string = false
+        }
+        if (!is_in_multiline_string && lines[i].startsWith('#')) {
+            continue
+        }
+        lines_without_comments.push(lines[i])
+    }
+    print(lines_without_comments)
+    script = lines_without_comments.join('\n')
+
+
+    // script = script.replaceAll(',\n', ',')
+    // script = script.replaceAll('(\n', '(')
+    // script = script.replaceAll('{\n', '{')
+    // script = script.replaceAll('[\n', '[')
+    // script = script.replaceAll('=\n', '=')
+    // script = script.replaceAll('+\n', '+')
     script = script.replaceAll(' == ', ' === ')
     script = script.replaceAll('.index(', '.indexOf(')
     script = script.replaceAll(' self.', ' this.')
     script = script.replaceAll('(self.', '(this.')
+    script = script.replaceAll('=self.', '=this.')
     script = script.replaceAll('def __init__(self, ', 'constructor(')
-    // script = script.replaceAll('(self.', '(this.')
 
     var all_lines = script.split('\n')
     var lines = []
@@ -318,13 +340,20 @@ function compile(script) {
             lines[i] = lines[i].replaceAll(`${n}%`, `${n}*.01`)
         }
     }
-    // add brackets based on indentation
+    // add braces({}) based on indentation
     current_indent = 0
     after_statement_indents = []
 
     for (var i=1; i<lines.length; i++) {
         prev_line = lines[i-1].trimEnd()
-        if (prev_line.endsWith('=') || prev_line.endsWith('+') || prev_line.endsWith('(')) {
+        skip_outer_loop = false
+        for (var line_ending of ['=', '+', '(', '[', '{', '-', ',']) {
+            if (prev_line.endsWith(line_ending)) {
+                skip_outer_loop = true
+                break
+            }
+        }
+        if (skip_outer_loop) {
             continue
         }
         prev_line_indent = get_indent(lines[i-1])
