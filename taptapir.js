@@ -841,17 +841,17 @@ class Entity {
             )
     }
 
-    appear() {
+    appear(duration=.5) {
         let target_scale_y = this.scale_y
         let target_scale_x = this.scale_x
         let target_text_alpha = this.text_alpha
         this.scale = [0,0]
         this.text_alpha = 0
         this.enabled = True
-        this.animate('scale_y', target_scale_y, .25)
-        after(.25, () => {
-            this.animate('scale_x', target_scale_x, .5)
-            this.animate('text_alpha', target_text_alpha, .25)
+        this.animate('scale_y', target_scale_y, duration/2)
+        after(duration/2, () => {
+            this.animate('scale_x', target_scale_x, duration)
+            this.animate('text_alpha', target_text_alpha, duration/2)
         })
     }
     close() {
@@ -865,6 +865,7 @@ class Entity {
     fit_to_text() {
         this.model.style.width = 'fit-content'
         this.model.style.height = 'fit-content'
+        return this
     }
 
     look_at(target_pos) {
@@ -1067,20 +1068,21 @@ function Canvas(options) {
 }
 
 function Scene(input) {
-    settings = {parent:scene, visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null}
-    _bg_color = input.color
-    input.color = null
-
-    for (const [key, value] of Object.entries(input)) {
-        settings[key] = value
+    settings = {parent:scene, visible_self:false, on_enter:null, on_exit:null, enabled:false, texture:null, color:color.black}
+    if (input) {
+        for (const [key, value] of Object.entries(input)) {
+            settings[key] = value
+        }
     }
+    _bg_color = settings.color
+
 
     _entity = new Entity(settings)
 
-    if (input.texture || _bg_color) {
+    if (settings.texture || _bg_color) {
         _entity.bg = new Entity({parent:_entity, scale_x:asp_x*camera.fov, scale_y:1/asp_y*camera.fov})
-        if (input.texture) {
-            _entity.bg.texture = input.texture
+        if (settings.texture) {
+            _entity.bg.texture = settings.texture
         }
         if (_bg_color) {
             _entity.bg.color = _bg_color
@@ -1090,7 +1092,7 @@ function Scene(input) {
 
     if (AUTOPARENT_TO_SCENE) {
         LAST_SCENE = _entity
-        // print('set LASTSCENE to:', _entity.name)
+        print('set LASTSCENE to:', _entity?.name ?? _entity)
     }
     return _entity
 }
@@ -1113,12 +1115,20 @@ class StateHandler {
 
     get state() {return this._state}
     set state(value) {
-        if (this.fade && (value != this._state)) {
-            camera.overlay.animate('alpha', 1, this.fade_in_duration)
+        this.set_state(value, this.fade, this.fade_in_duration, this.fade_out_duration)
+    }
+    set_state(value, fade=null, fade_in_duration=null, fade_out_duration=null) {
+        print('set state:', fade, fade_in_duration, fade_out_duration)
+        fade = fade ?? this.fade
+        fade_in_duration = fade_in_duration ?? this.fade_in_duration
+        fade_out_duration = fade_out_duration ?? this.fade_out_duration
+
+        if (fade && (value != this._state)) {
+            camera.overlay.animate('alpha', 1, fade_in_duration)
             setTimeout(() => {
-                camera.overlay.animate('alpha', 0, this.fade_out_duration)
+                camera.overlay.animate('alpha', 0, fade_out_duration)
                 this.hard_state = value
-            }, this.fade_in_duration*1000)
+            }, fade_in_duration*1000)
         }
         else {
             this.hard_state = value
@@ -1126,10 +1136,10 @@ class StateHandler {
         this._state = value
     }
     set hard_state(value) {     // set the state without fading
-        // print('set state to:', value)
-        if (this._state === value) {
-            return
-        }
+        // if (this._state === value) {
+        //     return
+        // }
+        print('set state',  this._state?.name ?? this._state ?? null, '-->', value?.name ?? value)
         for (let entity of this.states.values()) {
             if (value === entity || value === entity.name) {
                 entity.enabled = true
@@ -1151,12 +1161,13 @@ class StateHandler {
 
 scene_handler = new StateHandler({fade:true})
 
-function goto_scene(scene, fade=True) {
+function goto_scene(target_scene, fade=true, fade_in_duration=.5, fade_out_duration=1) {
     if (!fade) {
-        scene_handler.hard_state = scene
+        scene_handler.hard_state = target_scene
         return
     }
-    scene_handler.state = scene
+
+    scene_handler.set_state(target_scene, fade, fade_in_duration, fade_out_duration)
 }
 
 class HealthBar extends Entity {
