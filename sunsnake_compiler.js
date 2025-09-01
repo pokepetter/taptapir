@@ -80,13 +80,21 @@ function compile(script) {
         if (all_lines[i].includes(': #')) {
             all_lines[i] = all_lines[i].split(': #')[0] + ':'
         }
-        if (line == `'language=python'`) {
+        if (line.trimStart() == `'language=python'`) {
             _language = 'python'
         }
-        else if (line == `'language=sunsnake'`) {
+        else if (line.trimStart() == `'language=sunsnake'`) {
             _language = 'sunsnake'
         }
+        else if (line.trimStart() == `'language=javascript'`) {
+            _language = 'javascript'
+        }
         if (_language == 'python') {
+            continue
+        }
+
+        if (_language == 'javascript') {
+            lines.push(all_lines[i])
             continue
         }
         // if (is_in_multiline_string && !line.trimEnd().endsWith("'''")) {
@@ -172,6 +180,29 @@ function compile(script) {
         lines[i] = lines[i].replaceAll('.endswith(', '.endsWith(')
         lines[i] = lines[i].replaceAll('[-1]', '.at(-1)')
         lines[i] = lines[i].replaceAll(' # ', ' //')   // comments
+
+        if (lines[i].startsWith('class ') && lines[i].endsWith('):')) {
+            // print('------------', lines[i])
+            class_name = lines[i].split('(')[0].slice(len('class'))
+            // print('class_name:', class_name)
+            parent_class_name = lines[i].split('(')[1].slice(0, -2)
+            // print('parent_class_name:', parent_class_name)
+            lines[i] = `class ${class_name} extends ${parent_class_name}:`
+            // print('new line:', lines[i])
+        }
+        if (lines[i].trimStart().startsWith('super().__init__(')) {
+            last_part = lines[i].split('super().__init__(')[1].slice(0,-1)
+            // print('---last part:', last_part)
+            last_part = convert_arguments(`super(${last_part})`, 'super')
+            // print('---last part:', 'super('+last_part)
+            lines[i] = '        '+ last_part
+        }
+        if (lines[i].trimStart().startsWith('function ')) { // 'def' has already been replaced with 'function'
+            print('------------', lines[i])
+            // match: "function <name>(self, ...)" or "function <name>(self)"
+            lines[i] = lines[i].replace(/^(\s*)function\s+(\w+)\(self(?:,\s*)?/, '$1$2(');
+            print('------------', lines[i])
+        }
 
         // list comprehention
         if (lines[i].includes('[') && lines[i].includes(']') && lines[i].includes(' for ') && lines[i].includes(' in ') && !lines[i].endsWith(':') && !lines[i].includes('[[')) {
@@ -318,14 +349,16 @@ function compile(script) {
         }
 
         // add 'new' in front of class initializations
-        for (var class_name of _class_names) {
-            is_first_word = lines[i].startsWith(`${class_name}(`) ? '' : ' '        // don't add space if line starts with 'Entity(', do add otherwise, to ensure we match the whole name
-            if (lines[i].includes(`${is_first_word}${class_name}(`)) {
-                lines[i] = lines[i].replace(`${is_first_word}${class_name}(`, `${is_first_word}new ${class_name}(`)
-                lines[i] = convert_arguments(lines[i], class_name)
-            }
-            if (lines[i].startsWith(` new `)) {
-                lines[i] = lines[i].trimStart()
+        if (!lines[i].startsWith('class ')) {
+            for (var class_name of _class_names) {
+                is_first_word = lines[i].startsWith(`${class_name}(`) ? '' : ' '        // don't add space if line starts with 'Entity(', do add otherwise, to ensure we match the whole name
+                if (lines[i].includes(`${is_first_word}${class_name}(`)) {
+                    lines[i] = lines[i].replace(`${is_first_word}${class_name}(`, `${is_first_word}new ${class_name}(`)
+                    lines[i] = convert_arguments(lines[i], class_name)
+                }
+                if (lines[i].startsWith(` new `)) {
+                    lines[i] = lines[i].trimStart()
+                }
             }
         }
 
@@ -626,6 +659,9 @@ Array.prototype.take = function (n) {
 }
 Array.prototype.take_last = function (n) {
     return this.splice(-n)
+}
+Array.prototype.remove_last = function (n) {
+    return this.splice(0, -n)
 }
 
 Object.prototype.keys = function() {
