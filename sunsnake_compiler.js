@@ -168,12 +168,20 @@ function compile(script) {
         for (e of extra_replacements) {
             lines[i] = lines[i].replaceAll(e[0], e[1])
         }
+
+        if (/^\s*def (\w+)\s*\(/.test(lines[i])) {
+            lines[i] = lines[i].replace(/^(\s*)def (\w+)\s*\(/, '$1globalThis.$2 = function(')
+        } else if (/^\w+\s*=/.test(lines[i]) && get_indent(lines[i]) === 0) {
+            lines[i] = lines[i].replace(/^(\w+)\s*=\s*(.+)/, 'globalThis.$1 = $2');
+        } else {
+            lines[i] = lines[i].replace(/^(\w+)\s*=\s*(.+)/, 'let $1 = $2');
+        }
+
         lines[i] = lines[i].replaceAll(' and ', ' && ')
         lines[i] = lines[i].replaceAll(' or ', ' || ')
         lines[i] = lines[i].replaceAll(' not ', ' ! ')
         lines[i] = lines[i].replaceAll('(not ', '(! ')
-        lines[i] = lines[i].replaceAll('def ', 'function ')
-        lines[i] = lines[i].replaceAll('def():', 'function()')
+        lines[i] = lines[i].replaceAll('def():', 'function()') //I think this is fine because it's used locally for on_click
         lines[i] = lines[i].replaceAll('.append(', '.push(')
         lines[i] = lines[i].replaceAll('.add(', '.push(')
         lines[i] = lines[i].replaceAll('.sum()', '.reduce((a, b) => a + b, 0)')
@@ -710,7 +718,10 @@ for (var script of scripts) {
         print('compile:', script)
         if (script.textContent) {   // inline script content
             compiled_code = compile(script.textContent)
-            eval(compiled_code)
+            const run = new Function(compiled_code);
+            run();
+
+            //eval(compiled_code)
         }
         else if (script.src) {
             // Fetch the content from the src attribute if it exists
