@@ -1,4 +1,3 @@
-scale = 1
 print = console.log
 
 Array.prototype.remove = function (element) {
@@ -91,6 +90,10 @@ is_mobile = 'ontouchstart' in document.documentElement
 fullscreen = false
 camera = null
 ASPECT_RATIO = 9/16
+WIDTH = null
+HEIGHT = null
+SCALE = 1
+
 
 function set_orientation(value) {
     if (value == 'vertical') {
@@ -123,20 +126,24 @@ function set_aspect_ratio(_aspect_ratio) {
         print(browser_aspect_ratio, aspect_ratio)
         if (browser_aspect_ratio > ASPECT_RATIO) { // if the screen is wider than the game, like a pc monitor.
             print('vertical view on wide screen (probably pc)')
-            _game_window.style.width = `${width*scale/browser_aspect_ratio*ASPECT_RATIO}px`
-            _game_window.style.height =  `${height*scale}px`
+            HEIGHT = height*SCALE
+            WIDTH = width*SCALE/browser_aspect_ratio*ASPECT_RATIO
+            _game_window.style.width = `${width*SCALE/browser_aspect_ratio*ASPECT_RATIO}px`
+            _game_window.style.height =  `${height*SCALE}px`
         }
         else {                              // if the screen is taller than the game, like a phone screen.
             print('vertical view on talls screen (probably mobile)', width, width/ASPECT_RATIO, height)
-            _game_window.style.height = `${width/ASPECT_RATIO*scale}px`
-            _game_window.style.width =  `${width*scale}px`
+            HEIGHT = width/ASPECT_RATIO*SCALE
+            WIDTH = width*SCALE
+            _game_window.style.height = `${width/ASPECT_RATIO*SCALE}px`
+            _game_window.style.width =  `${width*SCALE}px`
         }
         if (camera) {camera.ui.scale = [1, 1*ASPECT_RATIO]}
         top_left =      [-.5, .5/ASPECT_RATIO]
         top_right =     [.5, .5/ASPECT_RATIO]
         bottom_left =   [-.5, -.5/ASPECT_RATIO]
         bottom_right =  [.5, -.5/ASPECT_RATIO]
-        top =           [0, .5/ASPECT_RATIO]
+        TOP =           [0, .5/ASPECT_RATIO]
         bottom =        [0, -.5/ASPECT_RATIO]
         left =          [-.5, 0]
         right =         [.5, 0]
@@ -148,12 +155,12 @@ function set_aspect_ratio(_aspect_ratio) {
         scene.style.width = `${1/asp_x*100}%`
         scene.style.height = `${1/asp_y*100}%`
         if (browser_aspect_ratio > ASPECT_RATIO) { // if the screen is wider than 16/9, fit to height
-            _game_window.style.height = `${height*scale}px`
-            _game_window.style.width =  `${width*scale/browser_aspect_ratio*ASPECT_RATIO}px`
+            _game_window.style.height = `${height*SCALE}px`
+            _game_window.style.width =  `${width*SCALE/browser_aspect_ratio*ASPECT_RATIO}px`
         }
         else {                              // if the screen is taller than 16/9, fit to width
-            _game_window.style.height = `${height*scale*browser_aspect_ratio/ASPECT_RATIO}px`
-            _game_window.style.width =  `${width*scale}px`
+            _game_window.style.height = `${height*SCALE*browser_aspect_ratio/ASPECT_RATIO}px`
+            _game_window.style.width =  `${width*SCALE}px`
         }
         if (camera) {camera.ui.scale = [1/ASPECT_RATIO, 1]}
         top_left =      [-.5*ASPECT_RATIO, .5]
@@ -274,7 +281,7 @@ color = {
 function set_window_color(value) {_game_window.style.backgroundColor = value}
 function set_background_color(value) {document.body.style.backgroundColor = value}
 function set_scale(value) {
-    scale = value
+    SCALE = value
     // set_orientation(format)
     set_aspect_ratio(ASPECT_RATIO)
 }
@@ -650,7 +657,9 @@ class Entity {
 
     get roundness() {return this._roundness}
     set roundness(value) {
-        this.model.style.borderRadius = `${value*Math.min(this.model.clientWidth, this.model.clientHeight)}px`
+        const rect = this.model.getBoundingClientRect();
+        const shortest_side = Math.min(rect.width, rect.height)
+        this.model.style.borderRadius = `${value * shortest_side}px`;
         this._roundness = clamp(value, 0, .5)
     }
     get shadow() {return this._shadow}
@@ -705,10 +714,12 @@ class Entity {
     set text_size(value) {
         this._text_size = value
         if (ASPECT_RATIO < 1) {
-            this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vh`
+            // this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vh`
+            this.model.style.fontSize = `${value * WIDTH / 75 * TEXT_SIZE_MULTIPLIER}px`
         }
         else {
-            this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vw`
+            this.model.style.fontSize = `${value * HEIGHT / 75 * TEXT_SIZE_MULTIPLIER}px`
+            // this.model.style.fontSize = `${value * scale * 1 * TEXT_SIZE_MULTIPLIER}vw`
         }
     }
 
@@ -730,7 +741,7 @@ class Entity {
     set padding(value) {
         this._padding = value
         if (typeof value == "number") {value = [value, value]}
-        this.model.style.padding = `${value[1]}em ${value[0]}em ${value[1]}em ${value[0]}em`
+        this.model.style.padding = `${value[1]*100}% ${value[0]*100}% ${value[1]*100}% ${value[0]*100}%`
     }
 
     get on_click() {return this._on_click}
@@ -1314,7 +1325,7 @@ mouse = {x:0, y:0, position:[0,0], left:false, middle:false, pressure:0.0, hover
 }
 
 mouse.click_animation = ''
-mouse.click_animation_entity = new Entity({'parent':camera.ui, 'scale':.2, 'z':-100, 'enabled':false, 'alpha':.5})
+mouse.click_animation_entity = new Entity({'parent':camera.ui, 'scale':.05, 'z':-100, 'enabled':false, 'alpha':.5})
 if (!mouse.click_animation) {
     mouse.click_animation_entity.visible = false
 }
@@ -1338,7 +1349,7 @@ function _handle_mouse_click(e) {
                 mouse.click_animation_entity.xy = mouse.position
                 mouse.click_animation_entity.enabled = True
                 mouse.click_animation_entity.texture = mouse.click_animation
-                print('play click anim')
+                // print('play click anim')
             }
             entity.model_scale = .98
             after(.05, () => {entity.model_scale = 1})
