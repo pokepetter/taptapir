@@ -173,7 +173,8 @@ function compile(script) {
         lines[i] = lines[i].replaceAll(' not ', ' ! ')
         lines[i] = lines[i].replaceAll('(not ', '(! ')
         lines[i] = lines[i].replaceAll('def ', 'function ')
-        lines[i] = lines[i].replaceAll('def():', 'function()')
+        lines[i] = lines[i].replaceAll('def():', '()=>')
+        // lines[i] = lines[i].replaceAll('def():', 'function()')
         lines[i] = lines[i].replaceAll('.append(', '.push(')
         lines[i] = lines[i].replaceAll('.add(', '.push(')
         lines[i] = lines[i].replaceAll('.sum()', '.reduce((a, b) => a + b, 0)')
@@ -459,12 +460,21 @@ function convert_arguments(line, class_name) {
     new_arguments = arguments
     has_inline_function = false
 
+
     if (arguments.includes(`function()`)) {
         has_inline_function = true
         func_content = arguments.split('function()')[1]
         lastIndex = arguments.lastIndexOf(')')
         func_content = func_content.substr(0, lastIndex) + func_content.substr(lastIndex)
         function_definition = 'function()' + func_content
+        new_arguments = arguments.replace(function_definition, `[INLINE_FUNC_PLACEHOLDER]`)
+    }
+    if (arguments.includes(`()=>`)) {
+        has_inline_function = true
+        func_content = arguments.split('()=>')[1]
+        lastIndex = arguments.lastIndexOf(')')
+        func_content = func_content.substr(0, lastIndex) + func_content.substr(lastIndex)
+        function_definition = '()=>' + func_content
         new_arguments = arguments.replace(function_definition, `[INLINE_FUNC_PLACEHOLDER]`)
     }
 
@@ -482,9 +492,10 @@ function convert_arguments(line, class_name) {
         }
     }
     js_style_arguments = '{' + new_arguments.replaceAll('=', ':') + '}'
+    // js_style_arguments = js_style_arguments.replace('():>', '()=>{')
 
     if (has_inline_function) {
-        js_style_arguments = js_style_arguments.replace('[INLINE_FUNC_PLACEHOLDER]', 'function(){' + func_content + '}')
+        js_style_arguments = js_style_arguments.replace('[INLINE_FUNC_PLACEHOLDER]', '()=>{' + func_content + '}')
     }
 
     return line.replace(arguments, js_style_arguments)
