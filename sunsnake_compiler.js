@@ -47,8 +47,12 @@ function compile(script) {
     script = script.replaceAll(' == ', ' === ')
     script = script.replaceAll('.index(', '.indexOf(')
     script = script.replaceAll(' self.', ' this.')
+    script = script.replaceAll(' self,', ' this,')
     script = script.replaceAll('(self.', '(this.')
     script = script.replaceAll('=self.', '=this.')
+    script = script.replaceAll('=self,', '=this,')
+    script = script.replaceAll('[self.', '[this.')
+    script = script.replaceAll('{self.', '{this.')
     script = script.replaceAll('def __init__(self, ', 'constructor(')
 
     var all_lines = script.split('\n')
@@ -130,7 +134,7 @@ function compile(script) {
         if (line.startsWith('after ') && all_lines[i].trimEnd().endsWith(':')) {
             start_indent = get_indent(all_lines[i])
             all_lines[i] = all_lines[i].replaceAll('after ', 'after(')
-            all_lines[i] = all_lines[i].slice(0,-1) + ', function()'
+            all_lines[i] = all_lines[i].slice(0,-1) + ', ()=>'
             for (var j=i+1; j<all_lines.length; j++) {
                 if (get_indent(all_lines[j]) <= start_indent) {
                     break
