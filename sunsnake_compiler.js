@@ -53,6 +53,9 @@ function compile(script) {
     script = script.replaceAll('=self,', '=this,')
     script = script.replaceAll('[self.', '[this.')
     script = script.replaceAll('{self.', '{this.')
+    script = script.replaceAll('+self.', '+this.')
+    script = script.replaceAll('-self.', '-this.')
+
     script = script.replaceAll('def __init__(self, ', 'constructor(')
 
     var all_lines = script.split('\n')
@@ -291,7 +294,7 @@ function compile(script) {
             // auto enumerate, match 'for ?, ? in ?'
             else {
                 elements = `[${elements}]`
-                if (!array.startsWith('enumerate(')) {
+                if (!array.startsWith('enumerate')) {
                     array = `enumerate(${array})`
                 }
                 lines[i] = `${start}for (let ${elements} of ${array})`
@@ -540,7 +543,7 @@ function round(value, digits=0) {
 }
 
 function enumerate(list) {
-    if (typeof list.prop2 === 'function') {
+    if (typeof list?.prop2 === 'function') {
         return list.entries()
     }
     else if (typeof list === 'object') {
@@ -586,6 +589,8 @@ class Array2D {
         });
     }
     get(x, y) {
+        x = int(x)
+        y = int(y)
         if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
             return this.data[x][y];
         }
@@ -602,7 +607,7 @@ class Array2D {
     }
 }
 
-function* enumerate_2d(target_2d_list) {
+function enumerate_2d(target_2d_list) {
     for (let x = 0; x < target_2d_list.length; x++) {
         let line = target_2d_list[x];
         for (let y = 0; y < line.length; y++) {
