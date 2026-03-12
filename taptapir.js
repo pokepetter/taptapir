@@ -603,7 +603,7 @@ class Entity {
                 this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}")`
             }
             else {
-                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}?${random.randint(0,999)}")`   // add random number so the gif restarts when setting .texture again
+                this.model.style.backgroundImage = `url("${TAPTAPIR_TEXTURES[name]}#${random.randint(0,999)}")`   // add random number so the gif restarts when setting .texture again. and use #, not ?, since it's a dataurl
             }
             this.color = color.clear
             return
@@ -613,7 +613,7 @@ class Entity {
             if (!name.includes('.')) {
                 var jpg_image = new Image();
                 jpg_image.onload = () => {
-                    print(`${name}.jpg exists`)
+                    // print(`${name}.jpg exists`)
                     this.texture = `${name}.jpg`
                     return
                 }
@@ -1056,6 +1056,11 @@ class Button extends Entity{
             settings[key] = value
         }
         super(settings)
+        this.lock_graphics = new Entity({parent:this, scale:1, text:'🔒', color:color.clear, text_origin:[0,0], text_size:6, enabled:false, on_click:()=>{print('locked')}})
+    }
+
+    set locked(value) {
+        this.lock_graphics.enabled = value
     }
 }
 
@@ -1103,7 +1108,7 @@ function Scene(input) {
 
     if (AUTOPARENT_TO_SCENE) {
         LAST_SCENE = _entity
-        print('set LASTSCENE to:', _entity?.name ?? _entity)
+        // print('set LASTSCENE to:', _entity?.name ?? _entity)
     }
     return _entity
 }
@@ -1624,7 +1629,7 @@ function sample(population, k){
     }
 
 function grid_layout(l, options) {
-    let settings = {spacing:[1.1,1.1], offset:[0,0], max_x:16}
+    let settings = {spacing:[1.1,1.1], offset:[0,0], max_x:16, y_direction:1}
     for (const [key, value] of Object.entries(options)) {
         // print('setting', key, 'to', value)
         settings[key] = value
@@ -1632,13 +1637,14 @@ function grid_layout(l, options) {
     spacing = settings['spacing']
     offset = settings['offset']
     max_x = settings['max_x']
+    y_direction = settings['y_direction']
     x = 0
     y = 0
 
     for (let i = 0; i < l.length; i++) {
         const e = l[i]
         e.xy = [(x * l[0].scale_x * spacing[0]) + offset[0],
-                (-y * l[1].scale_y * spacing[1]) + offset[1]]
+                (-(y*y_direction) * l[1].scale_y * spacing[1]) + offset[1]]
 
         x += 1
         if (x >= max_x) {
@@ -1659,8 +1665,15 @@ function destroy(_entity) {
     //delete _entity
 }
 
-function save_system_save(name, value) {localStorage.setItem(name, JSON.stringify(value))}
+function save_system_save(name, value) {
+    if (value === undefined) {
+        print(`save_system_save: ${name} is undefined`)
+        return
+    }
+    localStorage.setItem(name, JSON.stringify(value))
+}
 function save_system_load(name, fallback=0) {
+    print('save_system_load fallback:', fallback)
     if (!localStorage.hasOwnProperty(name)) {
         return fallback
     }
@@ -1815,6 +1828,7 @@ function _fullscreenchange() {
     set_scale(1)
 }
 document.addEventListener('fullscreenchange', _fullscreenchange)
+__PLATFORM__ = 'web'
 
 set_orientation('vertical')
 // set_orientation('horizontal')
